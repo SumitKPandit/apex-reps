@@ -25,6 +25,43 @@ const notes = ref("");
 const saving = ref(false);
 const initialized = ref(false);
 
+// Date ranges already assigned to the selected mentee (start_date to end_date)
+// Keyed by start_date for quick lookup; value is the end_date
+const menteePlanRanges = ref<Map<string, string>>(new Map());
+
+function isDateWithinRange(dateStr: string, rangeStart: string, rangeEnd: string) {
+  return dateStr >= rangeStart && dateStr <= rangeEnd;
+}
+
+function isStartDateBlocked(dateStr: string) {
+  for (const [rangeStart, rangeEnd] of menteePlanRanges.value.entries()) {
+    if (isDateWithinRange(dateStr, rangeStart, rangeEnd)) return true;
+  }
+  return false;
+}
+
+function getBlockedDateNotice() {
+  const ranges = Array.from(menteePlanRanges.value.entries());
+  if (ranges.length === 0) return "";
+  const notice = ranges
+    .map(([start, end]) => `${start} to ${end}`)
+    .join(", ");
+  return `This mentee already has plans assigned for: ${notice}. Please choose a start date outside these ranges.`;
+}
+
+async function fetchMenteePlanRanges(menteeId: string) {
+  menteePlanRanges.value.clear();
+  if (!menteeId) return;
+  try {
+    const plans = await dietPlanStore.fetchPlansForMentee(menteeId);
+    plans.forEach((p) => {
+      menteePlanRanges.value.set(p.start_date, p.end_date);
+    });
+  } catch (err) {
+    console.error("Failed to fetch mentee plan ranges:", err);
+  }
+}
+
 interface MealItem {
   id: string;
   foodItemId: string;
@@ -87,6 +124,8 @@ onMounted(async () => {
     } else if (mentees.value.length > 0) {
       selectedMenteeId.value = mentees.value[0]?.id ?? "";
     }
+
+    await fetchMenteePlanRanges(selectedMenteeId.value);
   } catch (err) {
     console.error("Failed to load mentees:", err);
     toast.add({ title: "Failed to load mentees", color: "error" });
@@ -94,6 +133,14 @@ onMounted(async () => {
 
   initialized.value = true;
 });
+
+// Refetch blocked date ranges when mentee changes
+watch(
+  () => selectedMenteeId.value,
+  async (newMenteeId) => {
+    await fetchMenteePlanRanges(newMenteeId);
+  },
+);
 
 function addSnack() {
   snackCount.value++;
@@ -136,6 +183,17 @@ async function savePlan() {
     return;
   }
 
+  // Validate that the selected start date doesn't conflict with existing plans
+  if (isStartDateBlocked(startDate.value)) {
+    const notice = getBlockedDateNotice();
+    toast.add({
+      title: "Cannot create plan for these dates",
+      description: notice || "This mentee already has a plan assigned for the selected start date. Please choose a different date.",
+      color: "error",
+    });
+    return;
+  }
+
   const mealsWithItems = meals.value.filter((m) => m.items.length > 0);
   if (mealsWithItems.length === 0) {
     toast.add({ title: "Please add at least one food item to a meal", color: "error" });
@@ -166,31 +224,23 @@ async function savePlan() {
     router.push("/coach/diet-plans");
   } catch (err) {
     console.error("Failed to save plan:", err);
-    toast.add({ title: err instanceof Error ? err.message : "Failed to save plan", color: "error" });
+    const message = err instanceof Error ? err.message : "Failed to save plan";
+    // Convert raw DB constraint error into a user-friendly message
+    if (message.includes("unique constraint") || message.includes("duplicate key")) {
+      toast.add({
+        title: "Plan already exists for this date",
+        description: "This mentee already has a plan starting on the selected date. Please choose a different start date.",
+        color: "error",
+      });
+    } else {
+      toast.add({ title: message, color: "error" });
+    }
   } finally {
     saving.value = false;
   }
 }
 
-// Auto-save when all mandatory fields are filled and at least one item exists
-watch(
-  () => ({
-    mentee: selectedMenteeId.value,
-    planName: planName.value,
-    startDate: startDate.value,
-    endDate: endDate.value,
-    items: meals.value.map((m) => m.items.length).join(","),
-  }),
-  async () => {
-    if (saving.value) return;
-    if (!initialized.value) return;
-    if (!selectedMenteeId.value || !planName.value || !startDate.value || !endDate.value) return;
-    const mealsWithItems = meals.value.filter((m) => m.items.length > 0);
-    if (mealsWithItems.length === 0) return;
-    await savePlan();
-  },
-  { deep: true },
-);
+
 </script>
 
 <template>
@@ -233,6 +283,9 @@ watch(
                 Start Date <span class="text-red-500">*</span>
               </label>
               <input v-model="startDate" type="date" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <p v-if="getBlockedDateNotice()" class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                {{ getBlockedDateNotice() }}
+              </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

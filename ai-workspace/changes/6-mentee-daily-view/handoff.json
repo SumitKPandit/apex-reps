@@ -1,0 +1,183 @@
+{
+  "issue_id": "6",
+  "mode": "feature",
+  "scope": {
+    "in": [
+      "Add mobile bottom nav with 3 tabs (Dashboard, Check-in, Diet Plan)",
+      "Add native HTML5 date picker to /diet-plan page",
+      "Make meal cards collapsible on /diet-plan page",
+      "Add vitest test scripts to package.json",
+      "Write component test for diet-plan page",
+      "Run typecheck, lint, unit tests; verify no regressions"
+    ],
+    "out": [
+      "Store layer changes (dietPlan.ts already complete)",
+      "Offline support (Issue #7 / Story 5)",
+      "E2E Playwright tests (Issue #8 / Story 6)",
+      "Coach-facing diet plan features (Issue #5 already complete)"
+    ]
+  },
+  "decisions": [
+    {
+      "id": "bottom-nav-visibility",
+      "choice": "Mobile-only (hidden on desktop)",
+      "rationale": "Bottom nav only on mobile viewport sizes; desktop keeps existing top header nav (Diet Plan link). Follows mobile-first pattern.",
+      "affects": ["app/components/BottomNav.vue", "app/layouts/default.vue"]
+    },
+    {
+      "id": "bottom-nav-tabs",
+      "choice": "Dashboard + Check-in + Diet Plan (3 tabs)",
+      "rationale": "Matches issue's 'new bottom nav tab'; covers three main mentee flows; KISS",
+      "affects": ["app/components/BottomNav.vue", "app/layouts/default.vue"]
+    },
+    {
+      "id": "date-picker",
+      "choice": "HTML5 <input type='date'> (native)",
+      "rationale": "No new deps, works natively on mobile, simple min/max for plan date range",
+      "affects": ["app/pages/diet-plan.vue"]
+    },
+    {
+      "id": "collapsible-meals",
+      "choice": "Simple Vue transition (v-show + CSS)",
+      "rationale": "KISS, no UI library dependency, minimal bundle impact, easy to test",
+      "affects": ["app/pages/diet-plan.vue"]
+    },
+    {
+      "id": "component-test-stack",
+      "choice": "Vitest + @vue/test-utils (existing config)",
+      "rationale": "Already configured in vitest.config.ts; consistent with existing store unit tests",
+      "affects": ["tests/unit/dietPlanPage.test.ts"]
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Add vitest test scripts to package.json",
+      "gate_level": "strict",
+      "depends_on": [],
+      "done": true,
+      "outputs": ["package.json"],
+      "test_results": {
+        "test:unit": "discovered existing tests (34 pass, 3 pre-existing failures in coach updatePlan error path — unrelated to this issue)",
+        "test:integration": "no test files yet (expected)"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Write component test for diet-plan page",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": ["tests/unit/dietPlanPage.test.ts"],
+      "test_results": {
+        "test:unit": "6/6 new tests pass; 40/43 total pass (3 pre-existing failures in coach updatePlan error path — unrelated)",
+        "lint": "dietPlanPage.test.ts clean; pre-existing errors in other files unchanged",
+        "typecheck": "passes"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Add mobile bottom nav with 3 tabs",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": ["app/components/BottomNav.vue", "app/layouts/default.vue"],
+      "test_results": {
+        "test:unit": "BottomNav 4/4 pass; dietPlanPage 6/6 pass (10/10 total)",
+        "lint": "no new errors (pre-existing warnings on default.vue line 59 unchanged)",
+        "typecheck": "passes"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Add native HTML5 date picker to diet-plan page",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": ["app/pages/diet-plan.vue"],
+      "test_results": {
+        "test:unit": "dietPlanPage 8/8 pass; BottomNav 4/4 pass (12/12 total; 3 pre-existing failures unrelated)",
+        "lint": "no new errors in diet-plan.vue or dietPlanPage.test.ts",
+        "typecheck": "passes"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Make meal cards collapsible",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": ["app/pages/diet-plan.vue"],
+      "test_results": {
+        "test:unit": "dietPlanPage 11/11 pass; BottomNav 4/4 pass (15/15 total; 3 pre-existing failures unrelated)",
+        "lint": "no new errors in diet-plan.vue or dietPlanPage.test.ts",
+        "typecheck": "passes"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Run all quality gates and verify no regressions",
+      "gate_level": "light",
+      "depends_on": [2, 3, 4, 5],
+      "done": true,
+      "outputs": [],
+      "test_results": {
+        "test:unit": "49 pass, 3 fail (3 pre-existing in coach updatePlan error path — unrelated to this issue)",
+        "lint": "6 errors all pre-existing (dag.ts, summarize.ts, existing source files); new files clean",
+        "typecheck": "passes"
+      }
+    },
+    {
+      "id": 7,
+      "title": "Block conflicting dates in create/edit diet plan views",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": ["app/stores/dietPlan.ts", "app/pages/coach/diet-plans/new.vue", "app/pages/coach/diet-plans/[id]/edit.vue"],
+      "test_results": {
+        "test:unit": "No new unit tests (validation is UI-level, verified via live QA)",
+        "lint": "no new errors",
+        "typecheck": "passes"
+      }
+    },
+    {
+      "id": 8,
+      "title": "User-friendly toast errors for constraint violations",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": ["app/pages/coach/diet-plans/new.vue", "app/pages/coach/diet-plans/[id]/edit.vue"],
+      "test_results": {
+        "test:unit": "No new unit tests (error handling verified via live QA)",
+        "lint": "no new errors",
+        "typecheck": "passes"
+      }
+    }
+  ],
+  "phase": "done",
+  "review": {
+    "reviewer": "implement-task agent",
+    "decision": "APPROVED",
+    "blocking_pass": 20,
+    "blocking_fail": 0,
+    "non_blocking": 4,
+    "rounds": 2,
+    "review_file": "ai-workspace/changes/6-mentee-daily-view/review.md"
+  },
+  "qa": {
+    "qa_report": "ai-workspace/changes/6-mentee-daily-view/qa-report.md",
+    "workflows_tested": 13,
+    "workflows_passed": 13,
+    "workflows_partial": 0,
+    "bugs_found": 10,
+    "bugs_fixed": 10,
+    "decision": "READY_FOR_MERGE"
+  },
+  "canonical_docs": {
+    "plan": "ai-workspace/changes/6-mentee-daily-view/plan.md",
+    "decisions": "ai-workspace/changes/6-mentee-daily-view/decisions.md"
+  },
+  "phase": "done",
+  "created_at": "2026-11-01T00:00:00Z",
+  "updated_at": "2026-11-01T00:00:00Z"
+}

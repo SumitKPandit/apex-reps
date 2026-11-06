@@ -47,13 +47,13 @@
 | `stats`        | `fetchAllStats()`, `fetchLeftPhotos()`, `saveStatsAndPhotos()`         |
 | `subscription` | `fetchActiveSubscription()`                                            |
 | `plan`         | `fetchPlan(planId)`                                                    |
-| `dietPlan`     | `fetchPlanForDate()`, `fetchLogs()`, `toggleConsumed()`, `saveNotes()`, `fetchMentees()`, `fetchCoachPlans()`, `createPlan()`, `updatePlan()`, `deletePlan()`, `fetchPlanForEdit()` |
+| `dietPlan`     | `fetchPlanForDate()`, `fetchLogs()`, `toggleConsumed()`, `saveNotes()`, `fetchMentees()`, `fetchCoachPlans()`, `createPlan()`, `updatePlan()`, `deletePlan()`, `fetchPlanForEdit()`, `fetchPlansForMentee()` |
 | `foodItem`     | `searchFoods()`, `createCustomFood()`                                  |
 
 ### Commands
 
 ```bash
-pnpm dev | build | generate | preview | lint | typecheck
+pnpm dev | build | generate | preview | lint | typecheck | test:unit | test:integration
 supabase start | stop | db push | migration new | db reset | db query
 npx playwright test | test --ui | test --debug
 ```
@@ -121,6 +121,7 @@ gh release create | list | view
 - `app/utils/supabase.ts` — Supabase client creation, auth token handling
 - `app/components/diet-plan/FoodSelector.vue` — autocomplete component
 - `app/components/diet-plan/CustomFoodModal.vue` — custom food modal
+- `app/components/BottomNav.vue` — mobile-only bottom navigation (Dashboard, Check-in, Diet Plan tabs)
 - `app/composables/useFoodCache.ts` — IndexedDB caching
 - `app/types/database.ts` — regenerate after migration
 - `.agents/skills/*.md` — update when workflows change

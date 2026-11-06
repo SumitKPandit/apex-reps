@@ -169,7 +169,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.body.style.overflow = "";
-  const modal = document.querySelector(".custom-food-modal") as HTMLElement;
+  const modal = document.querySelector(".custom-food-modal") as HTMLElement | null;
+  if (!modal) return;
   const modalWithCleanup = modal as HTMLElement & {
     _focusTrapCleanup?: () => void;
   };

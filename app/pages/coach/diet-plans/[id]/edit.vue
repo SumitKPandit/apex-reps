@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useProfileStore } from "@/stores/profile";
@@ -30,6 +30,43 @@ const planName = ref("");
 const startDate = ref("");
 const endDate = ref("");
 const notes = ref("");
+
+// Date ranges already assigned to this mentee (excluding the plan being edited)
+const menteePlanRanges = ref<Map<string, string>>(new Map());
+
+function isDateWithinRange(dateStr: string, rangeStart: string, rangeEnd: string) {
+  return dateStr >= rangeStart && dateStr <= rangeEnd;
+}
+
+function isStartDateBlocked(dateStr: string) {
+  for (const [rangeStart, rangeEnd] of menteePlanRanges.value.entries()) {
+    if (isDateWithinRange(dateStr, rangeStart, rangeEnd)) return true;
+  }
+  return false;
+}
+
+function getBlockedDateNotice() {
+  const ranges = Array.from(menteePlanRanges.value.entries());
+  if (ranges.length === 0) return "";
+  const notice = ranges
+    .map(([start, end]) => `${start} to ${end}`)
+    .join(", ");
+  return `This mentee already has plans assigned for: ${notice}. Please choose a start date outside these ranges.`;
+}
+
+async function fetchMenteePlanRanges(menteeId: string, excludePlanId: string) {
+  menteePlanRanges.value.clear();
+  if (!menteeId) return;
+  try {
+    const plans = await dietPlanStore.fetchPlansForMentee(menteeId);
+    plans.forEach((p) => {
+      if (p.id === excludePlanId) return; // Skip the plan being edited
+      menteePlanRanges.value.set(p.start_date, p.end_date);
+    });
+  } catch (err) {
+    console.error("Failed to fetch mentee plan ranges:", err);
+  }
+}
 
 interface MealItem {
   id: string;
@@ -95,6 +132,9 @@ onMounted(async () => {
     startDate.value = planData.start_date;
     endDate.value = planData.end_date;
     notes.value = planData.notes ?? "";
+
+    // Block date ranges of this mentee's other plans (excluding the one being edited)
+    await fetchMenteePlanRanges(planData.mentee_id, planId);
 
     // Transform meals and items - ensure default meals always exist
     const defaultMealIds = ["breakfast", "lunch", "dinner"];
@@ -186,6 +226,16 @@ async function savePlan() {
     return;
   }
 
+  // Validate that the selected start date doesn't conflict with other existing plans
+  if (isStartDateBlocked(startDate.value)) {
+    toast.add({
+      title: "Cannot update plan for these dates",
+      description: getBlockedDateNotice() || "This mentee already has a plan assigned for the selected start date. Please choose a different date.",
+      color: "error",
+    });
+    return;
+  }
+
   const mealsWithItems = meals.value.filter((m) => m.items.length > 0);
   if (mealsWithItems.length === 0) {
     toast.add({ title: "Please add at least one food item to a meal", color: "error" });
@@ -219,7 +269,16 @@ async function savePlan() {
     }
   } catch (err) {
     console.error("Failed to update plan:", err);
-    toast.add({ title: err instanceof Error ? err.message : "Failed to update plan", color: "error" });
+    const message = err instanceof Error ? err.message : "Failed to update plan";
+    if (message.includes("unique constraint") || message.includes("duplicate key")) {
+      toast.add({
+        title: "Plan already exists for this date",
+        description: "This mentee already has a plan starting on the selected date. Please choose a different start date.",
+        color: "error",
+      });
+    } else {
+      toast.add({ title: message, color: "error" });
+    }
   } finally {
     saving.value = false;
   }
@@ -289,6 +348,9 @@ async function deletePlan() {
                 Start Date <span class="text-red-500">*</span>
               </label>
               <input v-model="startDate" type="date" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <p v-if="getBlockedDateNotice()" class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                {{ getBlockedDateNotice() }}
+              </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
