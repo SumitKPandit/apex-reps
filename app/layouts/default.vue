@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import BottomNav from "@/components/BottomNav.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -64,6 +65,8 @@ const logout = async () => {
     <UMain>
       <NuxtPage />
     </UMain>
+
+    <BottomNav v-if="authStore.user?.user_metadata?.role !== 'coach'" />
 
     <USeparator />
 

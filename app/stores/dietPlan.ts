@@ -830,6 +830,46 @@ supabase = getSupabase(true);
     },
 
     /**
+     * Fetch existing plans for a specific mentee (lightweight: no meal data)
+     * Used to block date ranges that already have a plan assigned.
+     */
+    async fetchPlansForMentee(menteeId: string): Promise<Array<{
+      id: string;
+      name: string;
+      start_date: string;
+      end_date: string;
+    }>> {
+      this.loading = true;
+      this.error = null;
+      
+      try {
+        const supabase = getSupabase(true);
+        
+        const { data, error } = await supabase
+          .from("diet_plans")
+          .select("id, name, start_date, end_date")
+          .eq("mentee_id", menteeId)
+          .order("start_date", { ascending: true });
+        
+        if (error) throw new Error(error.message);
+        
+        return (data ?? []) as Array<{
+          id: string;
+          name: string;
+          start_date: string;
+          end_date: string;
+        }>;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to fetch mentee plans";
+        this.error = message;
+        console.error("Fetch mentee plans error:", err);
+        return [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    /**
      * Fetch a single plan with full structure for editing
      * Only allows coach to fetch their own plans
      */

@@ -20,6 +20,10 @@ export default defineConfig({
         __dirname,
         "./node_modules/.pnpm/vue@3.5.40_typescript@6.0.3/node_modules/vue",
       ),
+      "vue-router": path.resolve(
+        __dirname,
+        "./node_modules/.pnpm/vue-router@5.2.0_@vue+compiler-sfc@3.5.40_esbuild@0.28.0_pinia@4.0.3_@vue+devtools-api@_a5555d75bfc4f4cae5b9ea6a90b9e11e/node_modules/vue-router",
+      ),
     },
   },
 });
