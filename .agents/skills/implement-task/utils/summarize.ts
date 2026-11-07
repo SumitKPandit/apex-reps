@@ -24,7 +24,7 @@ export function estimateTokens(text: string): number {
 /**
  * Check if text contains TypeScript type definitions
  */
-function hasTypeDefinitions(text: string): boolean {
+function _hasTypeDefinitions(text: string): boolean {
   const patterns = [
     /interface\s+\w+/,
     /type\s+\w+\s*=/,
@@ -42,7 +42,7 @@ function hasTypeDefinitions(text: string): boolean {
 /**
  * Check if text contains decision records
  */
-function hasDecisions(text: string): boolean {
+function _hasDecisions(text: string): boolean {
   return (
     /(?:decision|choice|rationale|decided)[:\s]/i.test(text) ||
     /DECISIONS?/i.test(text)
@@ -52,7 +52,7 @@ function hasDecisions(text: string): boolean {
 /**
  * Check if text contains error messages
  */
-function hasErrors(text: string): boolean {
+function _hasErrors(text: string): boolean {
   return (
     /(?:error|Error|exception|Exception|failed|Failed)[:\s]/i.test(text) ||
     /throw new Error/i.test(text)
@@ -62,7 +62,7 @@ function hasErrors(text: string): boolean {
 /**
  * Check if text contains acceptance criteria
  */
-function hasCriteria(text: string): boolean {
+function _hasCriteria(text: string): boolean {
   return (
     /(?:acceptance|criteria|AC)[:\s]/i.test(text) ||
     /\[ \]/i.test(text) ||
@@ -73,7 +73,7 @@ function hasCriteria(text: string): boolean {
 /**
  * Check if text contains function signatures
  */
-function hasSignatures(text: string): boolean {
+function _hasSignatures(text: string): boolean {
   return (
     /(?:function|const|async function)\s+\w+\s*\(/i.test(text) ||
     /=>\s*\{/i.test(text) ||
@@ -215,23 +215,25 @@ function getPriority(type: string): number {
  */
 function summarizeBlock(
   block: { content: string; type: string; priority: number },
-  config: SummaryConfig,
+  _config: SummaryConfig,
 ): string {
   const lines = block.content.split("\n");
 
   switch (block.type) {
-    case "comments":
+    case "comments": {
       // Drop comments entirely unless they contain TODOs/FIXMEs
       const todos = lines.filter((l) => /TODO|FIXME|XXX|HACK/i.test(l));
       return todos.length > 0 ? todos.join("\n") : "";
+    }
 
     case "types":
     case "decisions":
     case "errors":
     case "criteria":
-    case "signatures":
+    case "signatures": {
       // Keep verbatim
       return block.content;
+    }
 
     default:
       // For other code, keep but compress blank lines

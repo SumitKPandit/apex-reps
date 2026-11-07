@@ -1,13 +1,13 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: "coach",
-});
-
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useProfileStore } from "@/stores/profile";
 import { useDietPlanStore } from "@/stores/dietPlan";
+
+definePageMeta({
+  layout: "coach",
+});
 
 const router = useRouter();
 const authStore = useAuthStore();

@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { useAuthStore } from "@/stores/auth";
 
-let supabase: SupabaseClient<Database> | null = null;
+const supabase: SupabaseClient<Database> | null = null;
 
 export const getSupabase = (useUserToken = false) => {
   const config = useRuntimeConfig();

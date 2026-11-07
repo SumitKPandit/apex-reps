@@ -81,7 +81,6 @@ import { useProfileStore } from "@/stores/profile";
 import { useSubStore } from "@/stores/subscription";
 import { usePlanStore } from "@/stores/plan";
 import { useStatsStore } from "@/stores/stats";
-import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { computed } from "vue";
 import ProgressPhotoCompare from "@/components/ProgressPhotoCompare.vue";
@@ -90,7 +89,6 @@ const profileStore = useProfileStore();
 const subStore = useSubStore();
 const planStore = usePlanStore();
 const statsStore = useStatsStore();
-const authStore = useAuthStore();
 const router = useRouter();
 const isLoading = ref(true);
 

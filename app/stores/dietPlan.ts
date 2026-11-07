@@ -434,6 +434,7 @@ export const useDietPlanStore = defineStore("dietPlan", {
           .from("profiles")
           .select("id, name")
           .eq("role", "mentee")
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .eq("coach_id" as any, profileStore.id);
 
         if (error) throw new Error(error.message);
