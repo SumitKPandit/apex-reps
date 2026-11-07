@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { useFoodItemStore } from "@/stores/foodItem";
 import { calculateMacros } from "@/utils/foodMacros";
 import CustomFoodModal from "@/components/diet-plan/CustomFoodModal.vue";
+import { useOnlineStatus } from "@/composables/useOnlineStatus";
 
 interface Props {
   /** Pre-selected food item ID */
@@ -45,6 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const store = useFoodItemStore();
+const { isOnline } = useOnlineStatus();
 
 const searchQuery = ref("");
 const searchInput = ref<HTMLInputElement | null>(null);
@@ -246,6 +248,24 @@ onUnmounted(() => {
           class="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent"
         />
       </div>
+    </div>
+
+    <!-- Offline / cached status strip -->
+    <div
+      v-if="!isOnline || store.searchFromCache"
+      class="mt-1 px-3 py-1.5 flex items-center gap-2 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg"
+    >
+      <span v-if="!isOnline" class="flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500" />
+        Offline
+      </span>
+      <span
+        v-if="store.searchFromCache"
+        class="flex items-center gap-1 text-amber-700 dark:text-amber-300"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500" />
+        Showing cached results
+      </span>
     </div>
 
     <!-- Dropdown Results -->

@@ -1,0 +1,70 @@
+{
+  "issue_id": "7",
+  "mode": "feature",
+  "scope": {
+    "in": [
+      "PWA: web app manifest (public/manifest.json) + service worker (public/sw.js) for shell precaching + offline fallback",
+      "PWA registration composable (app/composables/usePWA.ts) + manifest link + SW registration in app entry/layout",
+      "useOnlineStatus composable for online/offline detection",
+      "Wire useFoodCache (IndexedDB) into foodItem store for persistent offline food search",
+      "Background sync queue (useSyncQueue.ts) for createCustomFood: offline enqueue, reconnect flush",
+      "Offline UI in FoodSelector (cached results badge + offline chip, add from cache)",
+      "Unit tests for usePWA, useOnlineStatus, store cache integration, sync queue, FoodSelector offline",
+      "Run quality gates (test:unit, lint, typecheck, format:check, build); no regressions"
+    ],
+    "out": [
+      "Background Sync API (sync event when app closed) — app-level flush on reconnect covers open-app case",
+      "Full offline-first diet plan editing",
+      "E2E Playwright tests (Issue #8)"
+    ]
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "title": "Sync queue implementation location",
+      "status": "resolved",
+      "choice": "Option A — new useSyncQueue.ts composable",
+      "rationale": "Single responsibility, easy to unit test, keeps useFoodCache.ts focused on read cache",
+      "affects": ["app/composables/useSyncQueue.ts", "app/stores/foodItem.ts"]
+    },
+    {
+      "id": "D2",
+      "title": "Mutations to queue for background sync",
+      "status": "resolved",
+      "choice": "Option A — createCustomFood only",
+      "rationale": "Matches food cache work, minimal surface, easy to verify; diet plan log sync deferred",
+      "affects": ["app/stores/foodItem.ts", "app/composables/useSyncQueue.ts"]
+    },
+    {
+      "id": "D3",
+      "title": "Offline UI behavior in FoodSelector",
+      "status": "resolved",
+      "choice": "Option A — allow add from cache (cached badge + offline chip)",
+      "rationale": "Best offline UX for a PWA",
+      "affects": ["app/components/diet-plan/FoodSelector.vue"]
+    },
+    {
+      "id": "D4",
+      "title": "PWA implementation approach",
+      "status": "resolved",
+      "choice": "Option A — manual public/manifest.json + public/sw.js + usePWA.ts composable",
+      "rationale": "No extra build deps, full control, GitHub Pages friendly, minimal and transparent",
+      "affects": ["public/manifest.json", "public/sw.js", "app/composables/usePWA.ts", "app layout/entry"]
+    }
+  ],
+  "tasks": [
+    { "id": 1, "title": "Add useOnlineStatus composable + unit test", "gate_level": "strict", "depends_on": [], "done": true, "outputs": ["app/composables/useOnlineStatus.ts", "tests/unit/useOnlineStatus.test.ts"], "test_results": { "test:unit": "3/3 new tests pass; full suite 52 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete" } },
+    { "id": 2, "title": "PWA manifest + service worker + registration + unit test", "gate_level": "strict", "depends_on": [], "done": true, "outputs": ["public/manifest.json", "public/icons/icon-192.svg", "public/icons/icon-512.svg", "public/sw.js", "app/composables/usePWA.ts", "tests/unit/usePWA.test.ts", "app/layouts/default.vue"], "test_results": { "test:unit": "4/4 new tests pass; full suite 56 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files (2 pre-existing warnings in default.vue unchanged)", "typecheck": "passes", "build": "complete" } },
+    { "id": 3, "title": "Wire IndexedDB cache into foodItem store + unit test", "gate_level": "standard", "depends_on": [1], "done": true, "outputs": ["app/stores/foodItem.ts", "tests/unit/foodItemStore.test.ts", "idb-keyval (dep)"], "test_results": { "test:unit": "8/8 new tests pass; full suite 60 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete after adding idb-keyval dep" } },
+    { "id": 4, "title": "Background sync queue for createCustomFood + unit test", "gate_level": "standard", "depends_on": [1], "done": true, "outputs": ["app/composables/useSyncQueue.ts", "tests/unit/syncQueue.test.ts", "app/stores/foodItem.ts", "tests/unit/foodItemStore.test.ts"], "test_results": { "test:unit": "syncQueue 5/5 pass; foodItemStore 10/10 pass; full suite 67 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete" } },
+    { "id": 5, "title": "Offline UI in FoodSelector + component test", "gate_level": "standard", "depends_on": [3, 4], "done": true, "outputs": ["app/components/diet-plan/FoodSelector.vue", "app/stores/foodItem.ts", "tests/unit/FoodSelectorOffline.test.ts"], "test_results": { "test:unit": "3/3 new tests pass; full suite 70 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete" } },
+    { "id": 6, "title": "Run quality gates + verify no regressions", "gate_level": "light", "depends_on": [1, 2, 3, 4, 5], "done": false }
+  ],
+  "phase": "done",
+  "canonical_docs": {
+    "plan": "ai-workspace/changes/7-offline-support/plan.md",
+    "decisions": "ai-workspace/changes/7-offline-support/decisions.md"
+  },
+  "created_at": "2026-11-06T00:00:00Z",
+  "updated_at": "2026-11-06T00:00:00Z"
+}

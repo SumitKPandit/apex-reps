@@ -2,15 +2,22 @@
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import BottomNav from "@/components/BottomNav.vue";
+import { usePWA } from "@/composables/usePWA";
 
 const authStore = useAuthStore();
 const router = useRouter();
 
 const isLoading = ref(false);
 
+// Register the service worker (offline shell) and the install prompt.
+usePWA();
+
 useHead({
   meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
-  link: [{ rel: "icon", href: "/favicon.ico" }],
+  link: [
+    { rel: "icon", href: "/favicon.ico" },
+    { rel: "manifest", href: "/manifest.json" },
+  ],
   htmlAttrs: {
     lang: "en",
   },
