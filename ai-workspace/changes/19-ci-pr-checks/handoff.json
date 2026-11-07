@@ -73,8 +73,8 @@
       "test_results": {
         "typecheck": "pass",
         "build": "pass",
-        "test:unit": "70 pass / 3 fail (3 pre-existing dietPlanStore failures, unrelated)",
-        "lint": "23 pre-existing app/ errors (unchanged)"
+        "test:unit": "73 pass / 0 fail (3 pre-existing dietPlanStore failures fixed)",
+        "lint": "0 errors (23 pre-existing fixed)"
       }
     },
     {
@@ -96,8 +96,9 @@
       "done": false,
       "outputs": ["main branch protection requiring CI checks"],
       "verification": "main requires CI status checks before merge",
-      "note": "BLOCKED by pre-existing Prettier failures (68 files). Do NOT enable branch protection until prettier issues fixed and CI passes on PR #20. Admin access to upstream required.",
-      "qa_blocker": "CI Prettier step fails on 68 pre-existing files; .github/workflows/ci.yml passes prettier locally"
+      "note": "CI now passes on PR #20. Admin access to upstream required to enable branch protection.",
+      "qa_blocker": null,
+      "ci_status": "pass - https://github.com/mahima5srivastava/apex-reps/actions/runs/42349617788"
     }
   ],
   "canonical_docs": {

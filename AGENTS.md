@@ -100,8 +100,8 @@ gh release create | list | view
 
 `.github/workflows/ci.yml` runs on `push` and `pull_request` to `main` and `production`.
 Steps: Prettier, ESLint, typecheck, build, unit tests (E2E skipped — requires Supabase).
-
-**Blocker:** Pre-existing Prettier formatting issues across 68 files cause the CI Prettier step to fail on PRs. Do not enable branch protection requiring CI checks until these are fixed. See `ai-workspace/changes/19-ci-pr-checks/qa-report.md` for details.
+CI passes on all checks (Prettier, Lint, Typecheck, Build, Unit tests). Branch protection
+can be enabled on upstream `main` to require CI checks before merge (admin action).
 
 ## Gotchas (Always Relevant)
 
