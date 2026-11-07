@@ -11,9 +11,9 @@
 ## Acceptance Criteria
 
 1. `.github/workflows/ci.yml` triggers on `push` and `pull_request` targeting `main` and `production`.
-2. On every PR/push to `main` or `production`, CI runs: Prettier check, ESLint lint, Nuxt typecheck, `pnpm build`, Vitest unit tests.
+2. On every PR/push to `main` or `production`, CI runs as parallel jobs: Prettier check, ESLint lint, Nuxt typecheck, `pnpm build`, Vitest unit tests.
 3. PRs must pass all status checks before merge (GitHub branch protection — configure on upstream).
-4. E2E tests remain out of PR CI (require Supabase — tracked in #10/#8).
+4. E2E tests are not part of CI (require Supabase — tracked in #10/#8).
 5. No new dependencies added.
 6. No regressions to existing CI behavior.
 
