@@ -74,8 +74,8 @@ describe("dietPlanStore - Coach Actions", () => {
   describe("fetchMentees", () => {
     it("fetches mentees where role=mentee and coach_id=current user", async () => {
       const mockMentees = [
-        { id: "mentee-1", name: "Mentee One", email: "mentee1@test.com" },
-        { id: "mentee-2", name: "Mentee Two", email: "mentee2@test.com" },
+        { id: "mentee-1", name: "Mentee One" },
+        { id: "mentee-2", name: "Mentee Two" },
       ];
 
       const chain = createChain(mockMentees);
@@ -86,7 +86,7 @@ describe("dietPlanStore - Coach Actions", () => {
       const result = await store.fetchMentees();
 
       expect(mockFrom).toHaveBeenCalledWith("profiles");
-      expect(selectMock).toHaveBeenCalledWith("id, name, email");
+      expect(selectMock).toHaveBeenCalledWith("id, name");
       expect(chain.eq).toHaveBeenCalledWith("role", "mentee");
       expect(chain.eq).toHaveBeenCalledWith("coach_id", "coach-id-123");
       expect(result).toEqual(mockMentees);
@@ -296,7 +296,7 @@ describe("dietPlanStore - Coach Actions", () => {
 
       const store = useDietPlanStore();
       await expect(store.createPlan(validPlanData)).rejects.toThrow(
-        "Items insert failed",
+        "Failed to create all meals",
       );
 
       // Verify delete was called for meals and plan
@@ -449,6 +449,13 @@ describe("dietPlanStore - Coach Actions", () => {
     it("returns false on error", async () => {
       const deleteMealsChain = createChain([], new Error("Delete failed"));
       const deleteMealsTable = {
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi
+              .fn()
+              .mockReturnValue(createChain([], new Error("Delete failed"))),
+          }),
+        }),
         delete: vi
           .fn()
           .mockReturnValue({ eq: vi.fn().mockReturnValue(deleteMealsChain) }),
