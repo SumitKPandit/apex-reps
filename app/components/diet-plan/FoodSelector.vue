@@ -46,7 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const store = useFoodItemStore();
-const { isOnline } = useOnlineStatus();
+const { isOnline, stop } = useOnlineStatus();
 
 const searchQuery = ref("");
 const searchInput = ref<HTMLInputElement | null>(null);
@@ -217,6 +217,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener("click", handleOutsideClick);
+  stop();
   if (searchTimeout) clearTimeout(searchTimeout);
   if (searchAbortController) searchAbortController.abort();
 });
