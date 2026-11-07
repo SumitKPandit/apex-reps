@@ -99,9 +99,17 @@ gh release create | list | view
 ### CI on Pull Requests
 
 `.github/workflows/ci.yml` runs on `push` and `pull_request` to `main` and `production`.
-Steps: Prettier, ESLint, typecheck, build, unit tests (E2E skipped — requires Supabase).
-CI passes on all checks (Prettier, Lint, Typecheck, Build, Unit tests). Branch protection
-can be enabled on upstream `main` to require CI checks before merge (admin action).
+Checks run as separate parallel jobs, each showing individual status on PRs:
+
+| Job | What it runs |
+|-----|-------------|
+| `prettier` | `pnpm exec prettier --check .` |
+| `lint` | `pnpm run lint` |
+| `typecheck` | `pnpm run typecheck` |
+| `build` | `pnpm build` |
+| `unit-tests` | `pnpm test:unit` |
+
+CI passes on all checks. Branch protection can be enabled on upstream `main` to require CI checks before merge (admin action).
 
 ## Gotchas (Always Relevant)
 
