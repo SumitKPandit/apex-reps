@@ -17,7 +17,9 @@ export const getSupabase = (useUserToken = false) => {
   return createClient<Database>(
     config.public.supabaseUrl,
     config.public.supabaseKey,
-    token ? { global: { headers: { Authorization: `Bearer ${token}` } } } : undefined
+    token
+      ? { global: { headers: { Authorization: `Bearer ${token}` } } }
+      : undefined,
   );
 };
 

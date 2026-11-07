@@ -28,6 +28,7 @@
 **Status:** PARTIAL  
 **Steps:** Login as coach → Click "Create New Plan" → Select mentee "Mentee Two" → Enter plan name "QA Test Plan - Nov 2026" → Keep dates 2026-11-01 to 2026-11-08 → Search "chicken" in Breakfast → Select "Chicken breast, raw" → Set quantity 100g → Click Add → Click Save Plan  
 **Observations:**
+
 - Mentee combobox works (shows "Mentee Two" and "Test Mentee" options)
 - Plan name field accepts input
 - Food search works: typing "chicken" returns "Chicken breast, raw" and "Chicken thigh, raw" with per-100g macros
@@ -67,6 +68,7 @@
 **Status:** PASS  
 **Steps:** View mentee plan → Manually sum item macros vs displayed daily totals  
 **Observations:**
+
 - Calories: 305 + 17 + 365 + 360 + 144 = 1191 ✅ (matches displayed 1191 kcal)
 - Protein: 16.5 + 1.7 + 7.1 + 20 + 8 = 53.3 ✅ (matches displayed 53.3g)
 - Carbs: 24 + 2.5 + 80 + 60 + 24 = 190.5 ✅ (matches displayed 190.5g)
@@ -78,10 +80,12 @@
 **Status:** FAIL  
 **Steps:** Login as mentee → /diet-plan → Click checkbox on "Milk, whole" (Breakfast, 305 cal)  
 **Observations:** Checkbox UI updates to checked=true. However, no `diet_plan_logs` row is created in the database. Server log shows:
+
 ```
 ERROR: Could not find the 'macros' column of 'diet_plan_logs' in the schema cache
 at Proxy.toggleConsumed (app/stores/dietPlan.ts:198:22)
 ```
+
 Root cause: `toggleConsumed` action (line 348 of dietPlan.ts) attempts to upsert a `macros` column into `diet_plan_logs`, but that column does not exist in the schema. Macros belong on `diet_plan_food_items`, not `diet_plan_logs`. The `as Record<string, number>` cast bypasses TypeScript but fails at runtime.
 
 ### 10. API: RLS Verification
@@ -90,57 +94,57 @@ Root cause: `toggleConsumed` action (line 348 of dietPlan.ts) attempts to upsert
 **Steps:** Test each RLS policy via curl with coach and mentee tokens  
 **Observations:**
 
-| Policy | Test | Status | Result |
-|--------|------|--------|--------|
-| diet_plans_mentee_select | GET own plans as mentee | PASS | 200 |
-| diet_plans_mentee_select | GET other mentee's plans as mentee | PASS | [] (filtered, no leak) |
-| diet_plans_coach_crud | GET coach's mentee plans as coach | PASS | 200 |
-| food_items_insert_coach | POST food as mentee | PASS | 403 (blocked) |
-| food_items_insert_coach | POST food as coach | PASS | 201 (allowed) |
+| Policy                   | Test                               | Status | Result                 |
+| ------------------------ | ---------------------------------- | ------ | ---------------------- |
+| diet_plans_mentee_select | GET own plans as mentee            | PASS   | 200                    |
+| diet_plans_mentee_select | GET other mentee's plans as mentee | PASS   | [] (filtered, no leak) |
+| diet_plans_coach_crud    | GET coach's mentee plans as coach  | PASS   | 200                    |
+| food_items_insert_coach  | POST food as mentee                | PASS   | 403 (blocked)          |
+| food_items_insert_coach  | POST food as coach                 | PASS   | 201 (allowed)          |
 
 ---
 
 ## Acceptance Criteria Check
 
-| Criteria | Status | Evidence |
-|----------|--------|----------|
-| Coach sees list of all mentees and their plans | ✅ PASS | /coach/diet-plans shows mentees grouped with plans |
-| Coach creates full day plan: 3 meals + 2 snacks with multiple items each | ⚠️ PARTIAL | Can add foods to meals via FoodSelector; save blocked by date conflict + date picker UX issue |
-| Macros calculate correctly per meal and daily total | ✅ PASS | Verified in coach create (165 cal/31g protein) and mentee view (1191 kcal total matches item sum) |
-| Edit plan modifies existing data correctly | ❌ FAIL | Edit page not reachable via browser navigation |
-| Data persists after page reload | ⚠️ PARTIAL | Plan data persists in DB; consumption logs do NOT persist (BUG-001) |
+| Criteria                                                                 | Status     | Evidence                                                                                          |
+| ------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------- |
+| Coach sees list of all mentees and their plans                           | ✅ PASS    | /coach/diet-plans shows mentees grouped with plans                                                |
+| Coach creates full day plan: 3 meals + 2 snacks with multiple items each | ⚠️ PARTIAL | Can add foods to meals via FoodSelector; save blocked by date conflict + date picker UX issue     |
+| Macros calculate correctly per meal and daily total                      | ✅ PASS    | Verified in coach create (165 cal/31g protein) and mentee view (1191 kcal total matches item sum) |
+| Edit plan modifies existing data correctly                               | ❌ FAIL    | Edit page not reachable via browser navigation                                                    |
+| Data persists after page reload                                          | ⚠️ PARTIAL | Plan data persists in DB; consumption logs do NOT persist (BUG-001)                               |
 
 ---
 
 ## Bugs Found
 
-| ID | Severity | Workflow | Steps to Reproduce | Expected | Actual |
-|----|----------|----------|--------------------|----------|--------|
-| BUG-001 | Critical | Mentee: Check off item | Login as mentee → /diet-plan → Click checkbox on any food item | Log saved to `diet_plan_logs`, progress bar updates | Checkbox toggles UI but no DB row created. Error: "Could not find the 'macros' column of 'diet_plan_logs'" |
-| BUG-002 | Minor | Coach: Create plan | Open date picker on create form → Click a date (e.g., Nov 15) | Date field updates to selected date | Date stays on 2026-11-01; picker closes without updating |
-| BUG-003 | Minor | Coach: Edit plan | /coach/diet-plans → Click "Edit" link on a plan | Navigate to `/coach/diet-plans/:id/edit` | Page stays on list; direct URL open redirects back to list |
-| BUG-004 | Minor | Coach: Create plan | Try to create plan with start date that already exists for mentee | User-friendly error toast | Error logged to console only; no toast shown |
+| ID      | Severity | Workflow               | Steps to Reproduce                                                | Expected                                            | Actual                                                                                                     |
+| ------- | -------- | ---------------------- | ----------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| BUG-001 | Critical | Mentee: Check off item | Login as mentee → /diet-plan → Click checkbox on any food item    | Log saved to `diet_plan_logs`, progress bar updates | Checkbox toggles UI but no DB row created. Error: "Could not find the 'macros' column of 'diet_plan_logs'" |
+| BUG-002 | Minor    | Coach: Create plan     | Open date picker on create form → Click a date (e.g., Nov 15)     | Date field updates to selected date                 | Date stays on 2026-11-01; picker closes without updating                                                   |
+| BUG-003 | Minor    | Coach: Edit plan       | /coach/diet-plans → Click "Edit" link on a plan                   | Navigate to `/coach/diet-plans/:id/edit`            | Page stays on list; direct URL open redirects back to list                                                 |
+| BUG-004 | Minor    | Coach: Create plan     | Try to create plan with start date that already exists for mentee | User-friendly error toast                           | Error logged to console only; no toast shown                                                               |
 
 ---
 
 ## Skipped Workflows (from scope.out)
 
-| Workflow | Reason |
-|----------|--------|
+| Workflow                      | Reason                             |
+| ----------------------------- | ---------------------------------- |
 | Drag-and-drop meal reordering | Out of scope (fixed display_order) |
-| Bulk plan operations | Out of scope |
-| Plan versioning/history | Out of scope |
-| Coach dashboard analytics | Out of scope |
+| Bulk plan operations          | Out of scope                       |
+| Plan versioning/history       | Out of scope                       |
+| Coach dashboard analytics     | Out of scope                       |
 
 ---
 
 ## Non-Blocking Issues from review-code
 
-| Issue # | Category | Status |
-|---------|----------|--------|
-| N2 | RPC for true atomicity | Not verified (out of scope for QA) |
-| N5 | Extract transform helper | Not verified (out of scope for QA) |
-| N7 | Split dietPlanStore | Not verified (out of scope for QA) |
+| Issue # | Category                 | Status                             |
+| ------- | ------------------------ | ---------------------------------- |
+| N2      | RPC for true atomicity   | Not verified (out of scope for QA) |
+| N5      | Extract transform helper | Not verified (out of scope for QA) |
+| N7      | Split dietPlanStore      | Not verified (out of scope for QA) |
 
 ---
 

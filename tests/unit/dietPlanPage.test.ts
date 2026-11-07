@@ -28,7 +28,11 @@ vi.mock("@/stores/dietPlan", () => ({ useDietPlanStore: vi.fn() }));
 
 // Stub NuxtLink to avoid nested router links
 vi.mock("#components/nuxt-link.client", () => ({
-  default: { name: "NuxtLink", props: ["to"], template: "<a :href='to'><slot /></a>" },
+  default: {
+    name: "NuxtLink",
+    props: ["to"],
+    template: "<a :href='to'><slot /></a>",
+  },
 }));
 
 function buildStoreOverrides(overrides: Record<string, unknown> = {}) {
@@ -58,22 +62,32 @@ async function mountPage(overrides: Record<string, unknown> = {}) {
   vi.clearAllMocks();
 
   const authStore = buildStoreOverrides(overrides);
-  (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(authStore);
+  (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+    authStore,
+  );
 
   const profileStore = buildStoreOverrides(overrides);
-  (useProfileStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(profileStore);
+  (useProfileStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+    profileStore,
+  );
 
   const dietPlanStore = buildStoreOverrides(overrides);
-  (useDietPlanStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(dietPlanStore);
+  (useDietPlanStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+    dietPlanStore,
+  );
 
   const wrapper = mount(DietPlanPage, {
     global: {
       stubs: {
         UCard: { template: "<div class='u-card-stub'><slot /></div>" },
-        UButton: { template: "<button class='u-button-stub'><slot /></button>" },
+        UButton: {
+          template: "<button class='u-button-stub'><slot /></button>",
+        },
         UHeader: { template: "<div class='u-header-stub'><slot /></div>" },
         UMain: { template: "<main class='u-main-stub'><slot /></main>" },
-        UFooter: { template: "<footer class='u-footer-stub'><slot /></footer>" },
+        UFooter: {
+          template: "<footer class='u-footer-stub'><slot /></footer>",
+        },
         USeparator: { template: "<div class='u-separator-stub'></div>" },
         AppLogo: { template: "<div class='app-logo-stub'></div>" },
       },
@@ -122,7 +136,13 @@ describe("diet-plan page", () => {
                 id: "item-1",
                 food_item_id: "food-1",
                 quantity_g: 100,
-                macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                macros: {
+                  calories: 200,
+                  protein_g: 20,
+                  carbs_g: 10,
+                  fat_g: 8,
+                  fiber_g: 3,
+                },
                 foodItem: { id: "food-1", name: "Chicken breast" },
               },
             ],
@@ -172,7 +192,13 @@ describe("diet-plan page", () => {
                 id: "item-1",
                 food_item_id: "food-1",
                 quantity_g: 100,
-                macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                macros: {
+                  calories: 200,
+                  protein_g: 20,
+                  carbs_g: 10,
+                  fat_g: 8,
+                  fiber_g: 3,
+                },
                 foodItem: { id: "food-1", name: "Chicken breast" },
               },
             ],
@@ -282,7 +308,13 @@ describe("diet-plan page", () => {
                 id: "item-1",
                 food_item_id: "food-1",
                 quantity_g: 100,
-                macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                macros: {
+                  calories: 200,
+                  protein_g: 20,
+                  carbs_g: 10,
+                  fat_g: 8,
+                  fiber_g: 3,
+                },
                 foodItem: { id: "food-1", name: "Chicken breast" },
               },
             ],
@@ -316,7 +348,13 @@ describe("diet-plan page", () => {
                 id: "item-1",
                 food_item_id: "food-1",
                 quantity_g: 100,
-                macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                macros: {
+                  calories: 200,
+                  protein_g: 20,
+                  carbs_g: 10,
+                  fat_g: 8,
+                  fiber_g: 3,
+                },
                 foodItem: { id: "food-1", name: "Chicken breast" },
               },
             ],
@@ -333,7 +371,9 @@ describe("diet-plan page", () => {
       expect(wrapper.text()).toContain("Chicken breast");
 
       // Click meal header (button with type="button", unique flex justify-between button)
-      const mealHeader = wrapper.find('button[type="button"].flex.items-center.justify-between');
+      const mealHeader = wrapper.find(
+        'button[type="button"].flex.items-center.justify-between',
+      );
       await mealHeader.trigger("click");
       await wrapper.vm.$nextTick();
 
@@ -358,7 +398,13 @@ describe("diet-plan page", () => {
                 id: "item-1",
                 food_item_id: "food-1",
                 quantity_g: 100,
-                macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                macros: {
+                  calories: 200,
+                  protein_g: 20,
+                  carbs_g: 10,
+                  fat_g: 8,
+                  fiber_g: 3,
+                },
                 foodItem: { id: "food-1", name: "Chicken breast" },
               },
             ],
@@ -372,7 +418,9 @@ describe("diet-plan page", () => {
       });
 
       // Click twice: collapse then expand
-      const mealHeader = wrapper.find('button[type="button"].flex.items-center.justify-between');
+      const mealHeader = wrapper.find(
+        'button[type="button"].flex.items-center.justify-between',
+      );
       await mealHeader.trigger("click");
       await wrapper.vm.$nextTick();
       expect(wrapper.text()).not.toContain("Chicken breast");

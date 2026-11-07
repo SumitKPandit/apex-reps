@@ -10,27 +10,27 @@
 
 ## Getters
 
-| Getter | Returns | Description |
-|--------|---------|-------------|
-| `isLoading` | `boolean` | `loading` state |
+| Getter      | Returns          | Description        |
+| ----------- | ---------------- | ------------------ |
+| `isLoading` | `boolean`        | `loading` state    |
 | `lastError` | `string \| null` | Last error message |
 
 ## Actions
 
-| Action | Params | Returns | Description |
-|--------|--------|---------|-------------|
-| `fetchPlanForDate` | `date: string` | `Promise<void>` | Loads plan with meals + items + macros for date |
-| `fetchLogs` | `date: string` | `Promise<void>` | Loads consumption logs for date |
-| `fetchNotes` | `date: string` | `Promise<void>` | Loads daily notes for date |
-| `toggleConsumed` | `itemId: string, consumed: boolean` | `Promise<void>` | Toggles consumption, syncs to Supabase |
-| `saveNotes` | `date: string, notes: string` | `Promise<void>` | Saves daily notes |
-| `clearPlan` | — | `void` | Clears all plan state |
-| `fetchMentees` | — | `Promise<Profile[]>` | Coach's mentees (`role='mentee' AND coach_id=auth.uid()`) |
-| `fetchCoachPlans` | — | `Promise<DietPlanWithMeals[]>` | Plans with meals + items for coach's mentees |
-| `createPlan` | `data: CreatePlanInput` | `Promise<void>` | Transactional insert: diet_plan + meals + food_items |
-| `updatePlan` | `id: string, data: UpdatePlanInput` | `Promise<void>` | Replaces meals/items on existing plan |
-| `deletePlan` | `id: string` | `Promise<void>` | Cascades deletes meals + food_items |
-| `fetchPlanForEdit` | `id: string` | `Promise<DietPlanWithMeals>` | Loads full plan structure for editing |
+| Action             | Params                              | Returns                        | Description                                               |
+| ------------------ | ----------------------------------- | ------------------------------ | --------------------------------------------------------- |
+| `fetchPlanForDate` | `date: string`                      | `Promise<void>`                | Loads plan with meals + items + macros for date           |
+| `fetchLogs`        | `date: string`                      | `Promise<void>`                | Loads consumption logs for date                           |
+| `fetchNotes`       | `date: string`                      | `Promise<void>`                | Loads daily notes for date                                |
+| `toggleConsumed`   | `itemId: string, consumed: boolean` | `Promise<void>`                | Toggles consumption, syncs to Supabase                    |
+| `saveNotes`        | `date: string, notes: string`       | `Promise<void>`                | Saves daily notes                                         |
+| `clearPlan`        | —                                   | `void`                         | Clears all plan state                                     |
+| `fetchMentees`     | —                                   | `Promise<Profile[]>`           | Coach's mentees (`role='mentee' AND coach_id=auth.uid()`) |
+| `fetchCoachPlans`  | —                                   | `Promise<DietPlanWithMeals[]>` | Plans with meals + items for coach's mentees              |
+| `createPlan`       | `data: CreatePlanInput`             | `Promise<void>`                | Transactional insert: diet_plan + meals + food_items      |
+| `updatePlan`       | `id: string, data: UpdatePlanInput` | `Promise<void>`                | Replaces meals/items on existing plan                     |
+| `deletePlan`       | `id: string`                        | `Promise<void>`                | Cascades deletes meals + food_items                       |
+| `fetchPlanForEdit` | `id: string`                        | `Promise<DietPlanWithMeals>`   | Loads full plan structure for editing                     |
 
 ## Types
 
@@ -89,17 +89,19 @@ interface DietPlanLog {
 const store = useDietPlanStore();
 
 // Load plan for today
-await store.fetchPlanForDate('2026-01-15');
+await store.fetchPlanForDate("2026-01-15");
 
 // Check off a food item
-await store.toggleConsumed('food-item-id', true);
+await store.toggleConsumed("food-item-id", true);
 
 // Save notes
-await store.saveNotes('2026-01-15', 'Felt great today!');
+await store.saveNotes("2026-01-15", "Felt great today!");
 
 // Access data
-const totalCalories = store.currentPlan?.meals.flatMap(m => m.items).reduce((sum, i) => sum + i.macros.calories, 0);
-const consumed = store.logs['item-id']?.consumed;
+const totalCalories = store.currentPlan?.meals
+  .flatMap((m) => m.items)
+  .reduce((sum, i) => sum + i.macros.calories, 0);
+const consumed = store.logs["item-id"]?.consumed;
 ```
 
 ## Testing

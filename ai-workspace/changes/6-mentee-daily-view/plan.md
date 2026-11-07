@@ -7,11 +7,13 @@
 ## Status at Planning Time
 
 Issue #6 is **substantially implemented** already:
+
 - `app/pages/diet-plan.vue` — full page with progress bars, meal cards with checkboxes, notes section, prev/today/next date navigation
 - `app/stores/dietPlan.ts` — mentee actions: `fetchPlanForDate`, `fetchLogs`, `fetchNotes`, `toggleConsumed`, `saveNotes`, `clearPlan`
 - `tests/unit/dietPlanStore.test.ts` — thorough unit tests for mentee + coach store actions
 
 **Still missing (per issue acceptance criteria):**
+
 1. Bottom nav tab (currently Diet Plan link only in desktop header)
 2. Date picker at top (currently only ← / Today / → buttons)
 3. Collapsible meal cards (currently static cards)
@@ -28,25 +30,26 @@ Issue #6 is **substantially implemented** already:
 
 ## Codebase Investigation
 
-| Pattern / Location | Reuse For |
-|---|---|
-| `app/stores/dietPlan.ts` — `toggleConsumed` (upsert + optimistic local state) | Already implemented; no change needed |
-| `app/stores/dietPlan.ts` — `fetchPlanForDate`, `fetchLogs`, `fetchNotes` | Already implemented; no change needed |
-| `app/layouts/default.vue` — desktop header nav with Diet Plan link | Reference for bottom nav link styling |
-| `app/pages/diet-plan.vue` — existing page structure | Enhance in place (date picker, collapsible meals) |
-| `vitest.config.ts` — vitest + jsdom, `tests/**/*.test.ts` | Component test pattern |
-| `tests/unit/dietPlanStore.test.ts` — store mock pattern (`createChain`, `mockFrom`) | Reference for mocking Supabase in component test |
+| Pattern / Location                                                                  | Reuse For                                         |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `app/stores/dietPlan.ts` — `toggleConsumed` (upsert + optimistic local state)       | Already implemented; no change needed             |
+| `app/stores/dietPlan.ts` — `fetchPlanForDate`, `fetchLogs`, `fetchNotes`            | Already implemented; no change needed             |
+| `app/layouts/default.vue` — desktop header nav with Diet Plan link                  | Reference for bottom nav link styling             |
+| `app/pages/diet-plan.vue` — existing page structure                                 | Enhance in place (date picker, collapsible meals) |
+| `vitest.config.ts` — vitest + jsdom, `tests/**/*.test.ts`                           | Component test pattern                            |
+| `tests/unit/dietPlanStore.test.ts` — store mock pattern (`createChain`, `mockFrom`) | Reference for mocking Supabase in component test  |
 
 ## Test Plan (test-first per AGENTS.md)
 
-| Test Type | Scope | File |
-|---|---|---|
-| Unit | diet-plan page renders progress bars, meal items, checkboxes toggle, notes save, date nav | `tests/unit/dietPlanPage.test.ts` |
-| Integration | None needed — store integration already covered by `dietPlanStore.test.ts` | — |
+| Test Type   | Scope                                                                                     | File                              |
+| ----------- | ----------------------------------------------------------------------------------------- | --------------------------------- |
+| Unit        | diet-plan page renders progress bars, meal items, checkboxes toggle, notes save, date nav | `tests/unit/dietPlanPage.test.ts` |
+| Integration | None needed — store integration already covered by `dietPlanStore.test.ts`                | —                                 |
 
 ## Tasks (Ordered)
 
 ### Task 1: Add vitest test scripts to package.json
+
 **Type:** config  
 **Depends on:** none  
 **Gate level:** strict  
@@ -57,6 +60,7 @@ Issue #6 is **substantially implemented** already:
 **Rollback:** Remove the two script lines from package.json
 
 ### Task 2: Write component test for diet-plan page
+
 **Type:** test  
 **Depends on:** Task 1  
 **Gate level:** standard  
@@ -67,6 +71,7 @@ Issue #6 is **substantially implemented** already:
 **Rollback:** Delete `tests/unit/dietPlanPage.test.ts`
 
 ### Task 3: Add mobile-only bottom nav with 3 tabs (Dashboard, Check-in, Diet Plan)
+
 **Type:** component  
 **Depends on:** Task 1  
 **Gate level:** standard  
@@ -77,6 +82,7 @@ Issue #6 is **substantially implemented** already:
 **Rollback:** Remove BottomNav import and component from layout
 
 ### Task 4: Add native HTML5 date picker to diet-plan page
+
 **Type:** component  
 **Depends on:** Task 1  
 **Gate level:** standard  
@@ -87,6 +93,7 @@ Issue #6 is **substantially implemented** already:
 **Rollback:** Revert to ← / Today / → buttons
 
 ### Task 5: Make meal cards collapsible
+
 **Type:** component  
 **Depends on:** Task 1  
 **Gate level:** standard  
@@ -97,6 +104,7 @@ Issue #6 is **substantially implemented** already:
 **Rollback:** Revert to always-expanded meal cards
 
 ### Task 6: Run all quality gates and verify no regressions
+
 **Type:** verification  
 **Depends on:** Tasks 2, 3, 4, 5  
 **Gate level:** light  
@@ -107,11 +115,11 @@ Issue #6 is **substantially implemented** already:
 
 ## Risks & Rollback
 
-| Risk | Likelihood | Impact | Mitigation | Rollback |
-|---|---|---|---|---|
-| Bottom nav breaks desktop layout | Low | Medium | Hide on desktop via Tailwind `hidden`/`md:flex` | Remove component from layout |
-| Date picker conflicts with existing prev/next | Low | Low | Keep buttons as fallback; date input drives `selectedDate` watcher | Revert template changes |
-| Collapsible meals cause layout shift | Low | Low | Use CSS transition with fixed height or `v-show` | Revert to static cards |
+| Risk                                          | Likelihood | Impact | Mitigation                                                         | Rollback                     |
+| --------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------ | ---------------------------- |
+| Bottom nav breaks desktop layout              | Low        | Medium | Hide on desktop via Tailwind `hidden`/`md:flex`                    | Remove component from layout |
+| Date picker conflicts with existing prev/next | Low        | Low    | Keep buttons as fallback; date input drives `selectedDate` watcher | Revert template changes      |
+| Collapsible meals cause layout shift          | Low        | Low    | Use CSS transition with fixed height or `v-show`                   | Revert to static cards       |
 
 ## Outputs
 

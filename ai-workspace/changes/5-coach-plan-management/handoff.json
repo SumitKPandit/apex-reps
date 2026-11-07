@@ -79,9 +79,7 @@
       "depends_on": [],
       "done": true,
       "description": "Add coach-facing actions to useDietPlanStore: fetchMentees, fetchCoachPlans, createPlan, updatePlan, deletePlan, fetchPlanForEdit. Transactional insert for plan + meals + food_items.",
-      "files": [
-        "app/stores/dietPlan.ts"
-      ],
+      "files": ["app/stores/dietPlan.ts"],
       "tests": [
         "Unit: createPlan input validation",
         "Integration: createPlan inserts 3 tables atomically",
@@ -99,9 +97,7 @@
       "depends_on": [1],
       "done": true,
       "description": "Replace mock data with real fetchMentees + fetchCoachPlans. Show mentees grouped with their plans. Each plan shows: name, date range, status badge (active/upcoming/expired), actions (View, Edit).",
-      "files": [
-        "app/pages/coach/diet-plans.vue"
-      ],
+      "files": ["app/pages/coach/diet-plans.vue"],
       "tests": [
         "Integration: Page loads mentees + plans from store",
         "Unit: Status badge logic (active/upcoming/expired based on date)"
@@ -116,9 +112,7 @@
       "depends_on": [1],
       "done": true,
       "description": "Replace mock save with dietPlanStore.createPlan. Add Zod validation schema for plan form. Connect FoodSelector to meal builder. Meal macros display using sumMacros. On success, redirect to list with toast.",
-      "files": [
-        "app/pages/coach/diet-plans/new.vue"
-      ],
+      "files": ["app/pages/coach/diet-plans/new.vue"],
       "tests": [
         "Unit: Zod schema validates required fields, date logic",
         "Integration: Submit creates plan + meals + items in DB",
@@ -153,12 +147,8 @@
       "depends_on": [1],
       "done": true,
       "description": "Add fetchMyMentees() to useProfileStore. Query profiles where role='mentee' AND coach_id=auth.uid(). Used by create/edit pages for mentee dropdown.",
-      "files": [
-        "app/stores/profile.ts"
-      ],
-      "tests": [
-        "Integration: Returns only coach's mentees"
-      ],
+      "files": ["app/stores/profile.ts"],
+      "tests": ["Integration: Returns only coach's mentees"],
       "verification": "Mentee dropdown shows correct names."
     },
     {
@@ -169,9 +159,7 @@
       "depends_on": [],
       "done": true,
       "description": "Add Vitest unit tests for calculateMacros and sumMacros in app/utils/foodMacros.ts.",
-      "files": [
-        "tests/unit/foodMacros.spec.ts"
-      ],
+      "files": ["tests/unit/foodMacros.spec.ts"],
       "tests": [
         "calculateMacros scales correctly for various quantities",
         "calculateMacros throws on quantity <= 0",

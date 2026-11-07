@@ -49,16 +49,116 @@
       "status": "resolved",
       "choice": "Option A — manual public/manifest.json + public/sw.js + usePWA.ts composable",
       "rationale": "No extra build deps, full control, GitHub Pages friendly, minimal and transparent",
-      "affects": ["public/manifest.json", "public/sw.js", "app/composables/usePWA.ts", "app layout/entry"]
+      "affects": [
+        "public/manifest.json",
+        "public/sw.js",
+        "app/composables/usePWA.ts",
+        "app layout/entry"
+      ]
     }
   ],
   "tasks": [
-    { "id": 1, "title": "Add useOnlineStatus composable + unit test", "gate_level": "strict", "depends_on": [], "done": true, "outputs": ["app/composables/useOnlineStatus.ts", "tests/unit/useOnlineStatus.test.ts"], "test_results": { "test:unit": "3/3 new tests pass; full suite 52 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete" } },
-    { "id": 2, "title": "PWA manifest + service worker + registration + unit test", "gate_level": "strict", "depends_on": [], "done": true, "outputs": ["public/manifest.json", "public/icons/icon-192.svg", "public/icons/icon-512.svg", "public/sw.js", "app/composables/usePWA.ts", "tests/unit/usePWA.test.ts", "app/layouts/default.vue"], "test_results": { "test:unit": "4/4 new tests pass; full suite 56 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files (2 pre-existing warnings in default.vue unchanged)", "typecheck": "passes", "build": "complete" } },
-    { "id": 3, "title": "Wire IndexedDB cache into foodItem store + unit test", "gate_level": "standard", "depends_on": [1], "done": true, "outputs": ["app/stores/foodItem.ts", "tests/unit/foodItemStore.test.ts", "idb-keyval (dep)"], "test_results": { "test:unit": "8/8 new tests pass; full suite 60 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete after adding idb-keyval dep" } },
-    { "id": 4, "title": "Background sync queue for createCustomFood + unit test", "gate_level": "standard", "depends_on": [1], "done": true, "outputs": ["app/composables/useSyncQueue.ts", "tests/unit/syncQueue.test.ts", "app/stores/foodItem.ts", "tests/unit/foodItemStore.test.ts"], "test_results": { "test:unit": "syncQueue 5/5 pass; foodItemStore 10/10 pass; full suite 67 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete" } },
-    { "id": 5, "title": "Offline UI in FoodSelector + component test", "gate_level": "standard", "depends_on": [3, 4], "done": true, "outputs": ["app/components/diet-plan/FoodSelector.vue", "app/stores/foodItem.ts", "tests/unit/FoodSelectorOffline.test.ts"], "test_results": { "test:unit": "3/3 new tests pass; full suite 70 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)", "lint": "clean for new files", "typecheck": "passes", "build": "complete" } },
-    { "id": 6, "title": "Run quality gates + verify no regressions", "gate_level": "light", "depends_on": [1, 2, 3, 4, 5], "done": false }
+    {
+      "id": 1,
+      "title": "Add useOnlineStatus composable + unit test",
+      "gate_level": "strict",
+      "depends_on": [],
+      "done": true,
+      "outputs": [
+        "app/composables/useOnlineStatus.ts",
+        "tests/unit/useOnlineStatus.test.ts"
+      ],
+      "test_results": {
+        "test:unit": "3/3 new tests pass; full suite 52 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)",
+        "lint": "clean for new files",
+        "typecheck": "passes",
+        "build": "complete"
+      }
+    },
+    {
+      "id": 2,
+      "title": "PWA manifest + service worker + registration + unit test",
+      "gate_level": "strict",
+      "depends_on": [],
+      "done": true,
+      "outputs": [
+        "public/manifest.json",
+        "public/icons/icon-192.svg",
+        "public/icons/icon-512.svg",
+        "public/sw.js",
+        "app/composables/usePWA.ts",
+        "tests/unit/usePWA.test.ts",
+        "app/layouts/default.vue"
+      ],
+      "test_results": {
+        "test:unit": "4/4 new tests pass; full suite 56 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)",
+        "lint": "clean for new files (2 pre-existing warnings in default.vue unchanged)",
+        "typecheck": "passes",
+        "build": "complete"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Wire IndexedDB cache into foodItem store + unit test",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": [
+        "app/stores/foodItem.ts",
+        "tests/unit/foodItemStore.test.ts",
+        "idb-keyval (dep)"
+      ],
+      "test_results": {
+        "test:unit": "8/8 new tests pass; full suite 60 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)",
+        "lint": "clean for new files",
+        "typecheck": "passes",
+        "build": "complete after adding idb-keyval dep"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Background sync queue for createCustomFood + unit test",
+      "gate_level": "standard",
+      "depends_on": [1],
+      "done": true,
+      "outputs": [
+        "app/composables/useSyncQueue.ts",
+        "tests/unit/syncQueue.test.ts",
+        "app/stores/foodItem.ts",
+        "tests/unit/foodItemStore.test.ts"
+      ],
+      "test_results": {
+        "test:unit": "syncQueue 5/5 pass; foodItemStore 10/10 pass; full suite 67 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)",
+        "lint": "clean for new files",
+        "typecheck": "passes",
+        "build": "complete"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Offline UI in FoodSelector + component test",
+      "gate_level": "standard",
+      "depends_on": [3, 4],
+      "done": true,
+      "outputs": [
+        "app/components/diet-plan/FoodSelector.vue",
+        "app/stores/foodItem.ts",
+        "tests/unit/FoodSelectorOffline.test.ts"
+      ],
+      "test_results": {
+        "test:unit": "3/3 new tests pass; full suite 70 pass / 3 fail (3 pre-existing unrelated dietPlanStore failures)",
+        "lint": "clean for new files",
+        "typecheck": "passes",
+        "build": "complete"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Run quality gates + verify no regressions",
+      "gate_level": "light",
+      "depends_on": [1, 2, 3, 4, 5],
+      "done": false
+    }
   ],
   "phase": "done",
   "canonical_docs": {

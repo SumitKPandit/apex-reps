@@ -97,29 +97,38 @@ interface UpdatePlanInput {
 // Validation schema for plan input
 const planInputSchema = z.object({
   menteeId: z.string().uuid("Invalid mentee ID"),
-  name: z.string().min(1, "Plan name is required").max(100, "Plan name too long"),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid start date format"),
+  name: z
+    .string()
+    .min(1, "Plan name is required")
+    .max(100, "Plan name too long"),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid start date format"),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid end date format"),
   notes: z.string().optional(),
-  meals: z.array(
-    z.object({
-      name: z.string().min(1, "Meal name is required"),
-      displayOrder: z.number().int().min(0),
-      items: z.array(
-        z.object({
-          foodItemId: z.string().uuid("Invalid food item ID"),
-          quantityG: z.number().positive("Quantity must be positive"),
-          macros: z.object({
-            calories: z.number().int().min(0),
-            protein_g: z.number().min(0),
-            carbs_g: z.number().min(0),
-            fat_g: z.number().min(0),
-            fiber_g: z.number().min(0),
-          }),
-        }),
-      ).min(1, "Each meal must have at least one food item"),
-    }),
-  ).min(1, "At least one meal is required"),
+  meals: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Meal name is required"),
+        displayOrder: z.number().int().min(0),
+        items: z
+          .array(
+            z.object({
+              foodItemId: z.string().uuid("Invalid food item ID"),
+              quantityG: z.number().positive("Quantity must be positive"),
+              macros: z.object({
+                calories: z.number().int().min(0),
+                protein_g: z.number().min(0),
+                carbs_g: z.number().min(0),
+                fat_g: z.number().min(0),
+                fiber_g: z.number().min(0),
+              }),
+            }),
+          )
+          .min(1, "Each meal must have at least one food item"),
+      }),
+    )
+    .min(1, "At least one meal is required"),
 });
 
 export const useDietPlanStore = defineStore("dietPlan", {
@@ -133,26 +142,26 @@ export const useDietPlanStore = defineStore("dietPlan", {
     coachMentees: [] as CoachMentee[],
     coachPlans: [] as CoachPlanSummary[],
   }),
-  
+
   getters: {
     isLoading: (state) => state.loading,
     lastError: (state) => state.error,
   },
-  
+
   actions: {
     async fetchPlanForDate(date: string) {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
+
         const supabase = getSupabase();
-        
+
         // Get the active plan for this date
         const { data: plan, error: planError } = await supabase
           .from("diet_plans")
@@ -163,20 +172,21 @@ export const useDietPlanStore = defineStore("dietPlan", {
           .order("start_date", { ascending: false })
           .limit(1)
           .maybeSingle();
-        
+
         if (planError) throw new Error(planError.message);
-        
+
         if (!plan) {
           this.currentPlan = null;
           this.logs = {};
           this.notes = {};
           return;
         }
-        
+
         // Get meals with food items
         const { data: meals, error: mealsError } = await supabase
           .from("diet_plan_meals")
-          .select(`
+          .select(
+            `
             id,
             name,
             display_order,
@@ -199,14 +209,15 @@ export const useDietPlanStore = defineStore("dietPlan", {
                 fiber_g_per_100g
               )
             )
-          `)
+          `,
+          )
           .eq("diet_plan_id", plan.id)
           .order("display_order");
-        
+
         if (mealsError) throw new Error(mealsError.message);
-        
+
         // Transform meals
-        const transformedMeals: DietPlanMeal[] = (meals ?? []).map(meal => ({
+        const transformedMeals: DietPlanMeal[] = (meals ?? []).map((meal) => ({
           id: meal.id,
           name: meal.name,
           display_order: meal.display_order,
@@ -221,18 +232,22 @@ export const useDietPlanStore = defineStore("dietPlan", {
               fat_g: item.fat_g as number,
               fiber_g: item.fiber_g as number,
             },
-            foodItem: item.food_items ? {
-              id: item.food_items.id as string,
-              name: item.food_items.name as string,
-              calories_per_100g: item.food_items.calories_per_100g as number,
-              protein_g_per_100g: item.food_items.protein_g_per_100g as number,
-              carbs_g_per_100g: item.food_items.carbs_g_per_100g as number,
-              fat_g_per_100g: item.food_items.fat_g_per_100g as number,
-              fiber_g_per_100g: item.food_items.fiber_g_per_100g as number,
-            } : undefined,
+            foodItem: item.food_items
+              ? {
+                  id: item.food_items.id as string,
+                  name: item.food_items.name as string,
+                  calories_per_100g: item.food_items
+                    .calories_per_100g as number,
+                  protein_g_per_100g: item.food_items
+                    .protein_g_per_100g as number,
+                  carbs_g_per_100g: item.food_items.carbs_g_per_100g as number,
+                  fat_g_per_100g: item.food_items.fat_g_per_100g as number,
+                  fiber_g_per_100g: item.food_items.fiber_g_per_100g as number,
+                }
+              : undefined,
           })),
         }));
-        
+
         this.currentPlan = {
           id: plan.id,
           name: plan.name,
@@ -241,15 +256,15 @@ export const useDietPlanStore = defineStore("dietPlan", {
           notes: plan.notes,
           meals: transformedMeals,
         };
-        
+
         // Fetch logs for this date
         await this.fetchLogs(date);
-        
+
         // Fetch notes for this date
         await this.fetchNotes(date);
-        
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to load plan";
+        const message =
+          err instanceof Error ? err.message : "Failed to load plan";
         this.error = message;
         console.error("Fetch plan error:", err);
         throw err;
@@ -257,24 +272,24 @@ export const useDietPlanStore = defineStore("dietPlan", {
         this.loading = false;
       }
     },
-    
+
     async fetchLogs(date: string) {
       if (!this.currentPlan) return;
-      
+
       try {
         const profileStore = useProfileStore();
         const supabase = getSupabase();
-        
+
         // Get all food item IDs from the plan
-        const foodItemIds = this.currentPlan.meals.flatMap(meal => 
-          meal.items.map(item => item.id)
+        const foodItemIds = this.currentPlan.meals.flatMap((meal) =>
+          meal.items.map((item) => item.id),
         );
-        
+
         if (foodItemIds.length === 0) {
           this.logs = {};
           return;
         }
-        
+
         const { data, error } = await supabase
           .from("diet_plan_logs")
           .select("id, food_item_id, consumed, consumed_at")
@@ -282,28 +297,35 @@ export const useDietPlanStore = defineStore("dietPlan", {
           .eq("diet_plan_id", this.currentPlan.id)
           .eq("log_date", date)
           .in("food_item_id", foodItemIds);
-        
+
         if (error) throw new Error(error.message);
-        
-        const typedData = (data ?? []) as unknown as Array<{ id: string; food_item_id: string; consumed: boolean; consumed_at: string | null }>;
-        
-        this.logs = typedData.reduce((acc, log) => {
-          acc[log.food_item_id] = log;
-          return acc;
-        }, {} as Record<string, DietPlanLog>);
-        
+
+        const typedData = (data ?? []) as unknown as Array<{
+          id: string;
+          food_item_id: string;
+          consumed: boolean;
+          consumed_at: string | null;
+        }>;
+
+        this.logs = typedData.reduce(
+          (acc, log) => {
+            acc[log.food_item_id] = log;
+            return acc;
+          },
+          {} as Record<string, DietPlanLog>,
+        );
       } catch (err) {
         console.error("Fetch logs error:", err);
       }
     },
-    
+
     async fetchNotes(date: string) {
       if (!this.currentPlan) return;
-      
+
       try {
         const profileStore = useProfileStore();
         const supabase = getSupabase();
-        
+
         const { data, error } = await supabase
           .from("diet_plan_notes")
           .select("notes")
@@ -311,43 +333,42 @@ export const useDietPlanStore = defineStore("dietPlan", {
           .eq("diet_plan_id", this.currentPlan.id)
           .eq("log_date", date)
           .maybeSingle();
-        
+
         if (error) throw new Error(error.message);
-        
+
         if (data?.notes) {
           this.notes[date] = data.notes;
         } else {
           this.notes[date] = "";
         }
-        
       } catch (err) {
         console.error("Fetch notes error:", err);
       }
     },
-    
+
     async toggleConsumed(foodItemId: string, consumed: boolean) {
       if (!this.currentPlan) return;
-      
+
       try {
         const profileStore = useProfileStore();
         const supabase = getSupabase();
-        
-        const { error } = await supabase
-          .from("diet_plan_logs")
-          .upsert(
-            [{
+
+        const { error } = await supabase.from("diet_plan_logs").upsert(
+          [
+            {
               mentee_id: profileStore.id,
               diet_plan_id: this.currentPlan.id,
               food_item_id: foodItemId,
               log_date: new Date().toISOString().split("T")[0] ?? "",
               consumed,
               consumed_at: consumed ? new Date().toISOString() : null,
-            }],
-            { onConflict: "mentee_id, food_item_id, log_date" },
-          );
-        
+            },
+          ],
+          { onConflict: "mentee_id, food_item_id, log_date" },
+        );
+
         if (error) throw new Error(error.message);
-        
+
         // Update local state
         this.logs[foodItemId] = {
           ...this.logs[foodItemId],
@@ -356,39 +377,35 @@ export const useDietPlanStore = defineStore("dietPlan", {
           consumed,
           consumed_at: consumed ? new Date().toISOString() : null,
         };
-        
       } catch (err) {
         console.error("Toggle consumed error:", err);
         throw err;
       }
     },
-    
+
     async saveNotes(date: string, notes: string) {
       if (!this.currentPlan) return;
-      
+
       try {
         const profileStore = useProfileStore();
         const supabase = getSupabase();
-        
-        const { error } = await supabase
-          .from("diet_plan_notes")
-          .upsert({
-            mentee_id: profileStore.id,
-            diet_plan_id: this.currentPlan.id,
-            log_date: date,
-            notes,
-          });
-        
+
+        const { error } = await supabase.from("diet_plan_notes").upsert({
+          mentee_id: profileStore.id,
+          diet_plan_id: this.currentPlan.id,
+          log_date: date,
+          notes,
+        });
+
         if (error) throw new Error(error.message);
-        
+
         this.notes[date] = notes;
-        
       } catch (err) {
         console.error("Save notes error:", err);
         throw err;
       }
     },
-    
+
     clearPlan() {
       this.currentPlan = null;
       this.logs = {};
@@ -403,34 +420,38 @@ export const useDietPlanStore = defineStore("dietPlan", {
     async fetchMentees(): Promise<CoachMentee[]> {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
+
         const supabase = getSupabase(true);
-        
+
         const { data, error } = await supabase
           .from("profiles")
           .select("id, name")
           .eq("role", "mentee")
           .eq("coach_id" as any, profileStore.id);
-        
+
         if (error) throw new Error(error.message);
-        
-        const typedData = (data ?? []) as unknown as Array<{ id: string; name: string }>;
-        
+
+        const typedData = (data ?? []) as unknown as Array<{
+          id: string;
+          name: string;
+        }>;
+
         this.coachMentees = typedData.map((m) => ({
           id: m.id,
           name: m.name,
         }));
-        
+
         return this.coachMentees;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to fetch mentees";
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch mentees";
         this.error = message;
         console.error("Fetch mentees error:", err);
         return [];
@@ -445,19 +466,20 @@ export const useDietPlanStore = defineStore("dietPlan", {
     async fetchCoachPlans(): Promise<CoachPlanSummary[]> {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
+
         const supabase = getSupabase(true);
-        
+
         const { data, error } = await supabase
           .from("diet_plans")
-          .select(`
+          .select(
+            `
             id,
             name,
             mentee_id,
@@ -489,12 +511,13 @@ export const useDietPlanStore = defineStore("dietPlan", {
                 )
               )
             )
-          `)
+          `,
+          )
           .eq("coach_id", profileStore.id)
           .order("start_date", { ascending: false });
-        
+
         if (error) throw new Error(error.message);
-        
+
         const typedData = (data ?? []) as Array<{
           id: string;
           name: string;
@@ -528,35 +551,43 @@ export const useDietPlanStore = defineStore("dietPlan", {
             }>;
           }>;
         }>;
-        
-        const transformedPlans: CoachPlanSummary[] = typedData.map(plan => {
-          const meals: DietPlanMeal[] = (plan.diet_plan_meals ?? []).map(meal => ({
-            id: meal.id,
-            name: meal.name,
-            display_order: meal.display_order,
-            items: (meal.diet_plan_food_items ?? []).map(item => ({
-              id: item.id as string,
-              food_item_id: item.food_item_id as string,
-              quantity_g: item.quantity_g as number,
-              macros: {
-                calories: item.calories as number,
-                protein_g: item.protein_g as number,
-                carbs_g: item.carbs_g as number,
-                fat_g: item.fat_g as number,
-                fiber_g: item.fiber_g as number,
-              },
-              foodItem: item.food_items ? {
-                id: item.food_items.id as string,
-                name: item.food_items.name as string,
-                calories_per_100g: item.food_items.calories_per_100g as number,
-                protein_g_per_100g: item.food_items.protein_g_per_100g as number,
-                carbs_g_per_100g: item.food_items.carbs_g_per_100g as number,
-                fat_g_per_100g: item.food_items.fat_g_per_100g as number,
-                fiber_g_per_100g: item.food_items.fiber_g_per_100g as number,
-              } : undefined,
-            })),
-          }));
-          
+
+        const transformedPlans: CoachPlanSummary[] = typedData.map((plan) => {
+          const meals: DietPlanMeal[] = (plan.diet_plan_meals ?? []).map(
+            (meal) => ({
+              id: meal.id,
+              name: meal.name,
+              display_order: meal.display_order,
+              items: (meal.diet_plan_food_items ?? []).map((item) => ({
+                id: item.id as string,
+                food_item_id: item.food_item_id as string,
+                quantity_g: item.quantity_g as number,
+                macros: {
+                  calories: item.calories as number,
+                  protein_g: item.protein_g as number,
+                  carbs_g: item.carbs_g as number,
+                  fat_g: item.fat_g as number,
+                  fiber_g: item.fiber_g as number,
+                },
+                foodItem: item.food_items
+                  ? {
+                      id: item.food_items.id as string,
+                      name: item.food_items.name as string,
+                      calories_per_100g: item.food_items
+                        .calories_per_100g as number,
+                      protein_g_per_100g: item.food_items
+                        .protein_g_per_100g as number,
+                      carbs_g_per_100g: item.food_items
+                        .carbs_g_per_100g as number,
+                      fat_g_per_100g: item.food_items.fat_g_per_100g as number,
+                      fiber_g_per_100g: item.food_items
+                        .fiber_g_per_100g as number,
+                    }
+                  : undefined,
+              })),
+            }),
+          );
+
           return {
             id: plan.id,
             name: plan.name,
@@ -569,11 +600,12 @@ export const useDietPlanStore = defineStore("dietPlan", {
             meals,
           };
         });
-        
+
         this.coachPlans = transformedPlans;
         return this.coachPlans;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to fetch plans";
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch plans";
         this.error = message;
         console.error("Fetch coach plans error:", err);
         return [];
@@ -590,26 +622,28 @@ export const useDietPlanStore = defineStore("dietPlan", {
       // Validate input
       const validation = planInputSchema.safeParse(input);
       if (!validation.success) {
-        const message = validation.error.flatten().formErrors.join(", ") || "Validation failed";
+        const message =
+          validation.error.flatten().formErrors.join(", ") ||
+          "Validation failed";
         throw new Error(message);
       }
-      
+
       this.loading = true;
       this.error = null;
-      
+
       let planId: string | null = null;
       let mealIds: string[] = [];
       let supabase: ReturnType<typeof getSupabase> | null = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
-supabase = getSupabase(true);
-        
+
+        supabase = getSupabase(true);
+
         // 1. Insert diet plan
         const { data: plan, error: planError } = await supabase
           .from("diet_plans")
@@ -623,34 +657,34 @@ supabase = getSupabase(true);
           })
           .select("id")
           .single();
-        
+
         if (planError) throw new Error(planError.message);
         if (!plan) throw new Error("Failed to create plan");
-        
+
         planId = plan.id;
-        
+
         // 2. Insert meals
         const mealsToInsert = input.meals.map((meal) => ({
           diet_plan_id: planId!,
           name: meal.name,
           display_order: meal.displayOrder,
         }));
-        
+
         const { data: meals, error: mealsError } = await supabase
           .from("diet_plan_meals")
           .insert(mealsToInsert)
           .select("id");
-        
+
         if (mealsError) throw new Error(mealsError.message);
         if (!meals || meals.length !== input.meals.length) {
           throw new Error("Failed to create all meals");
         }
-        
-        mealIds = meals.map(m => m.id);
-        
+
+        mealIds = meals.map((m) => m.id);
+
         // 3. Insert food items for each meal
         const foodItemsToInsert = input.meals.flatMap((meal, mealIdx) =>
-          meal.items.map(item => ({
+          meal.items.map((item) => ({
             meal_id: mealIds[mealIdx]!,
             food_item_id: item.foodItemId,
             quantity_g: item.quantityG,
@@ -660,15 +694,15 @@ supabase = getSupabase(true);
             fat_g: item.macros.fat_g,
             fiber_g: item.macros.fiber_g,
             display_order: 0,
-          }))
+          })),
         );
-        
+
         const { error: itemsError } = await supabase
           .from("diet_plan_food_items")
           .insert(foodItemsToInsert);
-        
+
         if (itemsError) throw new Error(itemsError.message);
-        
+
         return { id: planId };
       } catch (err) {
         // Rollback: delete in reverse order
@@ -688,8 +722,9 @@ supabase = getSupabase(true);
             }
           }
         }
-        
-        const message = err instanceof Error ? err.message : "Failed to create plan";
+
+        const message =
+          err instanceof Error ? err.message : "Failed to create plan";
         this.error = message;
         console.error("Create plan error:", err);
         throw err;
@@ -705,33 +740,39 @@ supabase = getSupabase(true);
     async updatePlan(planId: string, input: UpdatePlanInput): Promise<boolean> {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
+
         const supabase = getSupabase(true);
-        
+
         // 1. Update plan basic info if provided
-        const planUpdate: { name?: string; start_date?: string; end_date?: string; notes?: string | null } = {};
+        const planUpdate: {
+          name?: string;
+          start_date?: string;
+          end_date?: string;
+          notes?: string | null;
+        } = {};
         if (input.name !== undefined) planUpdate.name = input.name;
-        if (input.startDate !== undefined) planUpdate.start_date = input.startDate;
+        if (input.startDate !== undefined)
+          planUpdate.start_date = input.startDate;
         if (input.endDate !== undefined) planUpdate.end_date = input.endDate;
         if (input.notes !== undefined) planUpdate.notes = input.notes ?? null;
-        
+
         if (Object.keys(planUpdate).length > 0) {
           const { error: planError } = await supabase
             .from("diet_plans")
             .update(planUpdate)
             .eq("id", planId)
             .eq("coach_id", profileStore.id);
-          
+
           if (planError) throw new Error(planError.message);
         }
-        
+
         // 2. If meals provided, replace them
         if (input.meals) {
           // Delete old meals (cascades to food_items)
@@ -739,31 +780,31 @@ supabase = getSupabase(true);
             .from("diet_plan_meals")
             .delete()
             .eq("diet_plan_id", planId);
-          
+
           if (deleteError) throw new Error(deleteError.message);
-          
+
           // Insert new meals
-          const mealsToInsert = input.meals.map(meal => ({
+          const mealsToInsert = input.meals.map((meal) => ({
             diet_plan_id: planId,
             name: meal.name,
             display_order: meal.displayOrder,
           }));
-          
+
           const { data: meals, error: mealsError } = await supabase
             .from("diet_plan_meals")
             .insert(mealsToInsert)
             .select("id");
-          
+
           if (mealsError) throw new Error(mealsError.message);
           if (!meals || meals.length !== input.meals.length) {
             throw new Error("Failed to create all meals");
           }
-          
-          const newMealIds = meals.map(m => m.id);
-          
+
+          const newMealIds = meals.map((m) => m.id);
+
           // Insert new food items
           const foodItemsToInsert = input.meals.flatMap((meal, mealIdx) =>
-            meal.items.map(item => ({
+            meal.items.map((item) => ({
               meal_id: newMealIds[mealIdx]!,
               food_item_id: item.foodItemId,
               quantity_g: item.quantityG,
@@ -773,19 +814,20 @@ supabase = getSupabase(true);
               fat_g: item.macros.fat_g,
               fiber_g: item.macros.fiber_g,
               display_order: 0,
-            }))
+            })),
           );
-          
+
           const { error: itemsError } = await supabase
             .from("diet_plan_food_items")
             .insert(foodItemsToInsert);
-          
+
           if (itemsError) throw new Error(itemsError.message);
         }
-        
+
         return true;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update plan";
+        const message =
+          err instanceof Error ? err.message : "Failed to update plan";
         this.error = message;
         console.error("Update plan error:", err);
         return false;
@@ -800,27 +842,28 @@ supabase = getSupabase(true);
     async deletePlan(planId: string): Promise<boolean> {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
+
         const supabase = getSupabase(true);
-        
+
         const { error } = await supabase
           .from("diet_plans")
           .delete()
           .eq("id", planId)
           .eq("coach_id", profileStore.id);
-        
+
         if (error) throw new Error(error.message);
-        
+
         return true;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to delete plan";
+        const message =
+          err instanceof Error ? err.message : "Failed to delete plan";
         this.error = message;
         console.error("Delete plan error:", err);
         return false;
@@ -833,26 +876,28 @@ supabase = getSupabase(true);
      * Fetch existing plans for a specific mentee (lightweight: no meal data)
      * Used to block date ranges that already have a plan assigned.
      */
-    async fetchPlansForMentee(menteeId: string): Promise<Array<{
-      id: string;
-      name: string;
-      start_date: string;
-      end_date: string;
-    }>> {
+    async fetchPlansForMentee(menteeId: string): Promise<
+      Array<{
+        id: string;
+        name: string;
+        start_date: string;
+        end_date: string;
+      }>
+    > {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const supabase = getSupabase(true);
-        
+
         const { data, error } = await supabase
           .from("diet_plans")
           .select("id, name, start_date, end_date")
           .eq("mentee_id", menteeId)
           .order("start_date", { ascending: true });
-        
+
         if (error) throw new Error(error.message);
-        
+
         return (data ?? []) as Array<{
           id: string;
           name: string;
@@ -860,7 +905,8 @@ supabase = getSupabase(true);
           end_date: string;
         }>;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to fetch mentee plans";
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch mentee plans";
         this.error = message;
         console.error("Fetch mentee plans error:", err);
         return [];
@@ -876,19 +922,20 @@ supabase = getSupabase(true);
     async fetchPlanForEdit(planId: string): Promise<CoachPlanSummary | null> {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const profileStore = useProfileStore();
         if (!profileStore.id) {
           await profileStore.fetchProfile();
         }
         if (!profileStore.id) throw new Error("Profile not found");
-        
+
         const supabase = getSupabase(true);
-        
+
         const { data, error } = await supabase
           .from("diet_plans")
-          .select(`
+          .select(
+            `
             id,
             name,
             mentee_id,
@@ -920,15 +967,16 @@ supabase = getSupabase(true);
                 )
               )
             )
-          `)
+          `,
+          )
           .eq("id", planId)
           .eq("coach_id", profileStore.id)
           .maybeSingle();
-        
+
         if (error) throw new Error(error.message);
-        
+
         if (!data) return null;
-        
+
         const typedData = data as {
           id: string;
           name: string;
@@ -962,34 +1010,42 @@ supabase = getSupabase(true);
             }>;
           }>;
         };
-        
-        const meals: DietPlanMeal[] = (typedData.diet_plan_meals ?? []).map(meal => ({
-          id: meal.id,
-          name: meal.name,
-          display_order: meal.display_order,
-          items: (meal.diet_plan_food_items ?? []).map(item => ({
-            id: item.id as string,
-            food_item_id: item.food_item_id as string,
-            quantity_g: item.quantity_g as number,
-            macros: {
-              calories: item.calories as number,
-              protein_g: item.protein_g as number,
-              carbs_g: item.carbs_g as number,
-              fat_g: item.fat_g as number,
-              fiber_g: item.fiber_g as number,
-            },
-            foodItem: item.food_items ? {
-              id: item.food_items.id as string,
-              name: item.food_items.name as string,
-              calories_per_100g: item.food_items.calories_per_100g as number,
-              protein_g_per_100g: item.food_items.protein_g_per_100g as number,
-              carbs_g_per_100g: item.food_items.carbs_g_per_100g as number,
-              fat_g_per_100g: item.food_items.fat_g_per_100g as number,
-              fiber_g_per_100g: item.food_items.fiber_g_per_100g as number,
-            } : undefined,
-          })),
-        }));
-        
+
+        const meals: DietPlanMeal[] = (typedData.diet_plan_meals ?? []).map(
+          (meal) => ({
+            id: meal.id,
+            name: meal.name,
+            display_order: meal.display_order,
+            items: (meal.diet_plan_food_items ?? []).map((item) => ({
+              id: item.id as string,
+              food_item_id: item.food_item_id as string,
+              quantity_g: item.quantity_g as number,
+              macros: {
+                calories: item.calories as number,
+                protein_g: item.protein_g as number,
+                carbs_g: item.carbs_g as number,
+                fat_g: item.fat_g as number,
+                fiber_g: item.fiber_g as number,
+              },
+              foodItem: item.food_items
+                ? {
+                    id: item.food_items.id as string,
+                    name: item.food_items.name as string,
+                    calories_per_100g: item.food_items
+                      .calories_per_100g as number,
+                    protein_g_per_100g: item.food_items
+                      .protein_g_per_100g as number,
+                    carbs_g_per_100g: item.food_items
+                      .carbs_g_per_100g as number,
+                    fat_g_per_100g: item.food_items.fat_g_per_100g as number,
+                    fiber_g_per_100g: item.food_items
+                      .fiber_g_per_100g as number,
+                  }
+                : undefined,
+            })),
+          }),
+        );
+
         return {
           id: typedData.id,
           name: typedData.name,
@@ -1002,7 +1058,8 @@ supabase = getSupabase(true);
           meals,
         };
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to fetch plan for edit";
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch plan for edit";
         this.error = message;
         console.error("Fetch plan for edit error:", err);
         return null;

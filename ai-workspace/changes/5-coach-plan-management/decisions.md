@@ -10,6 +10,7 @@
 **Context:** Create/Edit pages need a dropdown of the coach's mentees.
 
 **Options:**
+
 1. **Query `profiles` where `role = 'mentee' AND coach_id = auth.uid()`** (recommended) — Direct, uses existing coach_id FK on profiles
 2. Join through `diet_plans` — Only shows mentees with existing plans
 3. New `coach_mentees` junction table — Over-engineering
@@ -24,6 +25,7 @@
 **Context:** How to display plans on `/coach/diet-plans`.
 
 **Options:**
+
 1. **Group by mentee** (recommended) — Mentee card with their plans listed inside
 2. Flat list with mentee name column — Simpler but less organized
 3. Tabs per mentee — More clicks
@@ -38,6 +40,7 @@
 **Context:** Where to put the edit plan UI.
 
 **Options:**
+
 1. **Separate route: `/coach/diet-plans/:id/edit`** (recommended) — RESTful, shareable URL, browser history
 2. Modal on list page — Keeps context but harder to share/deep-link
 3. Same page as create with `?edit=id` — Conflates create vs edit
@@ -52,6 +55,7 @@
 **Context:** Meals have `display_order` column. How to manage ordering.
 
 **Options:**
+
 1. **Fixed order: Breakfast=0, Lunch=1, Dinner=2, Snacks=3,4,...** (recommended) — No drag-drop complexity
 2. Drag-and-drop reordering — Nice UX but significant effort
 3. User-entered order number — Error-prone
@@ -66,6 +70,7 @@
 **Context:** DB has unique constraint on `(mentee_id, start_date)`. One active plan per mentee per start date.
 
 **Options:**
+
 1. **Client-side check + server error handling** (recommended) — Query existing plans for mentee, warn before submit; catch DB error as fallback
 2. Server error only — Simpler client, worse UX
 3. Auto-adjust date (e.g., next available) — Confusing for coach
@@ -80,6 +85,7 @@
 **Context:** `diet_plans.notes` column exists (coach-facing notes, separate from mentee daily notes).
 
 **Options:**
+
 1. **Include optional textarea in create/edit** (recommended) — Uses existing column
 2. Omit for now — Misses useful field
 3. Separate "plan details" page — Over-engineering
@@ -94,6 +100,7 @@
 **Context:** Plan form needs validation (required fields, date logic, unique check).
 
 **Options:**
+
 1. **Zod schema** (recommended) — Consistent with CustomFoodModal, type-safe
 2. Manual validation — Inconsistent, more boilerplate
 3. VeeValidate + Yup — Extra dependency
@@ -108,6 +115,7 @@
 **Context:** List view shows plan status (active/upcoming/expired).
 
 **Options:**
+
 1. **Client-side calculation from dates** (recommended) — No extra data needed
 2. Store computed status — Stale risk
 3. DB view/function — Overkill
@@ -122,6 +130,7 @@
 **Context:** Create plan inserts into 3 tables: `diet_plans`, `diet_plan_meals`, `diet_plan_food_items`.
 
 **Options:**
+
 1. **Sequential inserts with cleanup on failure** (recommended) — Simple, no RPC needed
 2. Postgres function (RPC) — Atomic but adds migration complexity
 3. Supabase transaction (not directly supported) — Not available
@@ -136,6 +145,7 @@
 **Context:** Editing a plan replaces meals and food items.
 
 **Options:**
+
 1. **Delete old meals/items → insert new** (recommended) — Simpler than diffing
 2. Diff and patch individual rows — Complex, marginal benefit
 3. Soft delete + insert new — Schema doesn't support soft delete
@@ -147,15 +157,15 @@
 
 ## Summary Table
 
-| ID | Decision | Choice |
-|----|----------|--------|
-| 1 | Mentee source | `profiles` where `role='mentee' AND coach_id=auth.uid()` |
-| 2 | List grouping | Group by mentee |
-| 3 | Edit route | `/coach/diet-plans/:id/edit` |
-| 4 | Meal order | Fixed (Breakfast=0, Lunch=1, Dinner=2, Snacks=3+) |
-| 5 | Unique constraint | Client check + server error |
-| 6 | Coach notes | Include optional textarea |
-| 7 | Validation | Zod schema |
-| 8 | Status badges | Client-side date comparison |
-| 9 | Create transaction | Sequential inserts with rollback |
-| 10 | Update strategy | Delete old meals/items → insert new |
+| ID  | Decision           | Choice                                                   |
+| --- | ------------------ | -------------------------------------------------------- |
+| 1   | Mentee source      | `profiles` where `role='mentee' AND coach_id=auth.uid()` |
+| 2   | List grouping      | Group by mentee                                          |
+| 3   | Edit route         | `/coach/diet-plans/:id/edit`                             |
+| 4   | Meal order         | Fixed (Breakfast=0, Lunch=1, Dinner=2, Snacks=3+)        |
+| 5   | Unique constraint  | Client check + server error                              |
+| 6   | Coach notes        | Include optional textarea                                |
+| 7   | Validation         | Zod schema                                               |
+| 8   | Status badges      | Client-side date comparison                              |
+| 9   | Create transaction | Sequential inserts with rollback                         |
+| 10  | Update strategy    | Delete old meals/items → insert new                      |

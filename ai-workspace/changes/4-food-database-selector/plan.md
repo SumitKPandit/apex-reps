@@ -209,11 +209,13 @@ Build the food database layer and coach-facing food selector component.
 **Description:** Autocomplete dropdown + quantity input + macro preview + "Add Custom Food" button.
 
 **Files created/modified:**
+
 - `app/components/diet-plan/FoodSelector.vue` — New component
 - `app/components/diet-plan/CustomFoodModal.vue` — New modal component
 - `tests/unit/FoodSelector.test.ts` — Unit tests (5 passing)
 
 **Test first (implement-task writes):**
+
 - [x] Unit: Component renders, emits events
 - [ ] Integration: Search → select → quantity → emits calculated macros
 
@@ -232,10 +234,12 @@ Build the food database layer and coach-facing food selector component.
 **Description:** `useFoodCache.ts` for caching search results with TTL.
 
 **Files created/modified:**
+
 - `app/composables/useFoodCache.ts` — New composable (uses `@vueuse/integrations/useIDBKeyval`)
 - Added `@vueuse/core` and `@vueuse/integrations` to dependencies
 
 **Test first (implement-task writes):**
+
 - [ ] Unit: Cache set/get, TTL expiry, fallback to network
 
 **Verification:** Offline search works for cached queries (composable ready for store integration)

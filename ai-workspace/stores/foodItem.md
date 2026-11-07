@@ -9,18 +9,18 @@
 
 ## Getters
 
-| Getter | Returns | Description |
-|--------|---------|-------------|
-| `isLoading` | `boolean` | `loading` state |
+| Getter      | Returns          | Description        |
+| ----------- | ---------------- | ------------------ |
+| `isLoading` | `boolean`        | `loading` state    |
 | `lastError` | `string \| null` | Last error message |
 
 ## Actions
 
-| Action | Params | Returns | Description |
-|--------|--------|---------|-------------|
-| `searchFoods` | `query: string` | `Promise<FoodItemSearchResult[]>` | Searches food_items with ILIKE, debounced 300ms, cached 24h |
-| `createCustomFood` | `input: CustomFoodInput` | `Promise<FoodItemSearchResult>` | Inserts food as `source='custom'`, clears cache |
-| `clearCache` | — | `void` | Clears in-memory search cache |
+| Action             | Params                   | Returns                           | Description                                                 |
+| ------------------ | ------------------------ | --------------------------------- | ----------------------------------------------------------- |
+| `searchFoods`      | `query: string`          | `Promise<FoodItemSearchResult[]>` | Searches food_items with ILIKE, debounced 300ms, cached 24h |
+| `createCustomFood` | `input: CustomFoodInput` | `Promise<FoodItemSearchResult>`   | Inserts food as `source='custom'`, clears cache             |
+| `clearCache`       | —                        | `void`                            | Clears in-memory search cache                               |
 
 ## Types
 
@@ -33,7 +33,7 @@ interface FoodItemSearchResult {
   carbs_g_per_100g: number;
   fat_g_per_100g: number;
   fiber_g_per_100g: number;
-  source: 'usda' | 'custom';
+  source: "usda" | "custom";
 }
 
 interface CustomFoodInput {
@@ -61,11 +61,11 @@ interface CustomFoodInput {
 const store = useFoodItemStore();
 
 // Search
-const results = await store.searchFoods('chicken');
+const results = await store.searchFoods("chicken");
 
 // Create custom food
 const food = await store.createCustomFood({
-  name: 'Whey Isolate',
+  name: "Whey Isolate",
   calories_per_100g: 370,
   protein_g_per_100g: 90,
   carbs_g_per_100g: 3,

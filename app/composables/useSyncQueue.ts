@@ -46,7 +46,9 @@ export function useSyncQueue() {
    * Add an item to the queue and persist it.
    * Returns the generated item id.
    */
-  async function enqueue(item: Omit<QueueItem, "id" | "timestamp">): Promise<string> {
+  async function enqueue(
+    item: Omit<QueueItem, "id" | "timestamp">,
+  ): Promise<string> {
     const entry: QueueItem = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       timestamp: Date.now(),
@@ -66,7 +68,9 @@ export function useSyncQueue() {
    * Replay every queued item through `replay`. Items that succeed are removed;
    * items that throw are kept for a later retry.
    */
-  async function flush(replay: (item: QueueItem) => Promise<void>): Promise<void> {
+  async function flush(
+    replay: (item: QueueItem) => Promise<void>,
+  ): Promise<void> {
     if (isFlushing.value) return;
     isFlushing.value = true;
     const remaining: QueueItem[] = [];

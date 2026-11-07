@@ -70,7 +70,10 @@ export const useFoodItemStore = defineStore("foodItem", {
       const indexed = await getCache().get<FoodItemSearchResult[]>(trimmed);
       if (indexed) {
         this.searchFromCache = true;
-        this.searchCache.set(cacheKey, { data: indexed, timestamp: Date.now() });
+        this.searchCache.set(cacheKey, {
+          data: indexed,
+          timestamp: Date.now(),
+        });
         this.searchResults = indexed;
         return indexed;
       }
@@ -112,7 +115,10 @@ export const useFoodItemStore = defineStore("foodItem", {
 
         // Persist to IndexedDB and in-memory cache.
         await getCache().set(trimmed, results);
-        this.searchCache.set(cacheKey, { data: results, timestamp: Date.now() });
+        this.searchCache.set(cacheKey, {
+          data: results,
+          timestamp: Date.now(),
+        });
         this.searchFromCache = false;
         this.searchResults = results;
         return results;
@@ -121,7 +127,10 @@ export const useFoodItemStore = defineStore("foodItem", {
         const stale = await getCache().get<FoodItemSearchResult[]>(trimmed);
         if (stale) {
           this.searchFromCache = true;
-          this.searchCache.set(cacheKey, { data: stale, timestamp: Date.now() });
+          this.searchCache.set(cacheKey, {
+            data: stale,
+            timestamp: Date.now(),
+          });
           this.searchResults = stale;
           return stale;
         }
@@ -231,20 +240,25 @@ export const useFoodItemStore = defineStore("foodItem", {
       const supabase = getSupabase();
       await getSyncQueue().flush(async (item) => {
         if (item.type !== "createCustomFood") return;
-        const { name, calories_per_100g, protein_g_per_100g, carbs_g_per_100g, fat_g_per_100g, fiber_g_per_100g, created_by } =
-          item.payload as CustomFoodInput & { created_by: string };
-        const { error } = await supabase
-          .from("food_items")
-          .insert({
-            name,
-            calories_per_100g,
-            protein_g_per_100g,
-            carbs_g_per_100g,
-            fat_g_per_100g,
-            fiber_g_per_100g,
-            source: "custom",
-            created_by,
-          });
+        const {
+          name,
+          calories_per_100g,
+          protein_g_per_100g,
+          carbs_g_per_100g,
+          fat_g_per_100g,
+          fiber_g_per_100g,
+          created_by,
+        } = item.payload as CustomFoodInput & { created_by: string };
+        const { error } = await supabase.from("food_items").insert({
+          name,
+          calories_per_100g,
+          protein_g_per_100g,
+          carbs_g_per_100g,
+          fat_g_per_100g,
+          fiber_g_per_100g,
+          source: "custom",
+          created_by,
+        });
         if (error) throw new Error(error.message);
       });
       // Refresh in-memory results so newly synced custom foods appear.

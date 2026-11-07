@@ -66,7 +66,9 @@ describe("dietPlanStore - Coach Actions", () => {
       fetchProfile: vi.fn().mockResolvedValue(undefined),
     };
 
-    (useProfileStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockProfileStore);
+    (useProfileStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockProfileStore,
+    );
   });
 
   describe("fetchMentees", () => {
@@ -188,7 +190,13 @@ describe("dietPlanStore - Coach Actions", () => {
             {
               foodItemId: "123e4567-e89b-12d3-a456-426614174001",
               quantityG: 100,
-              macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+              macros: {
+                calories: 200,
+                protein_g: 20,
+                carbs_g: 10,
+                fat_g: 8,
+                fiber_g: 3,
+              },
             },
           ],
         },
@@ -199,7 +207,13 @@ describe("dietPlanStore - Coach Actions", () => {
             {
               foodItemId: "123e4567-e89b-12d3-a456-426614174002",
               quantityG: 150,
-              macros: { calories: 300, protein_g: 30, carbs_g: 15, fat_g: 12, fiber_g: 4 },
+              macros: {
+                calories: 300,
+                protein_g: 30,
+                carbs_g: 15,
+                fat_g: 12,
+                fiber_g: 4,
+              },
             },
           ],
         },
@@ -212,8 +226,18 @@ describe("dietPlanStore - Coach Actions", () => {
       const planSelectMock = vi.fn().mockReturnValue(planChain);
       // Mock meals insert
       const mealsChain = createChain([
-        { id: "meal-1", diet_plan_id: "new-plan-id", name: "Breakfast", display_order: 0 },
-        { id: "meal-2", diet_plan_id: "new-plan-id", name: "Lunch", display_order: 1 },
+        {
+          id: "meal-1",
+          diet_plan_id: "new-plan-id",
+          name: "Breakfast",
+          display_order: 0,
+        },
+        {
+          id: "meal-2",
+          diet_plan_id: "new-plan-id",
+          name: "Lunch",
+          display_order: 1,
+        },
       ]);
       const mealsSelectMock = vi.fn().mockReturnValue(mealsChain);
       // Mock food items insert
@@ -224,9 +248,15 @@ describe("dietPlanStore - Coach Actions", () => {
       const itemsSelectMock = vi.fn().mockReturnValue(itemsChain);
 
       mockFrom
-        .mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: planSelectMock }) })
-        .mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: mealsSelectMock }) })
-        .mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: itemsSelectMock }) });
+        .mockReturnValueOnce({
+          insert: vi.fn().mockReturnValue({ select: planSelectMock }),
+        })
+        .mockReturnValueOnce({
+          insert: vi.fn().mockReturnValue({ select: mealsSelectMock }),
+        })
+        .mockReturnValueOnce({
+          insert: vi.fn().mockReturnValue({ select: itemsSelectMock }),
+        });
 
       const store = useDietPlanStore();
       const result = await store.createPlan(validPlanData);
@@ -242,19 +272,32 @@ describe("dietPlanStore - Coach Actions", () => {
       const planChain = createChain([{ id: "new-plan-id", ...validPlanData }]);
       const planSelectMock = vi.fn().mockReturnValue(planChain);
       const mealsChain = createChain([
-        { id: "meal-1", diet_plan_id: "new-plan-id", name: "Breakfast", display_order: 0 },
+        {
+          id: "meal-1",
+          diet_plan_id: "new-plan-id",
+          name: "Breakfast",
+          display_order: 0,
+        },
       ]);
       const mealsSelectMock = vi.fn().mockReturnValue(mealsChain);
       const itemsChain = createChain([], new Error("Items insert failed"));
       const itemsSelectMock = vi.fn().mockReturnValue(itemsChain);
 
       mockFrom
-        .mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: planSelectMock }) })
-        .mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: mealsSelectMock }) })
-        .mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: itemsSelectMock }) });
+        .mockReturnValueOnce({
+          insert: vi.fn().mockReturnValue({ select: planSelectMock }),
+        })
+        .mockReturnValueOnce({
+          insert: vi.fn().mockReturnValue({ select: mealsSelectMock }),
+        })
+        .mockReturnValueOnce({
+          insert: vi.fn().mockReturnValue({ select: itemsSelectMock }),
+        });
 
       const store = useDietPlanStore();
-      await expect(store.createPlan(validPlanData)).rejects.toThrow("Items insert failed");
+      await expect(store.createPlan(validPlanData)).rejects.toThrow(
+        "Items insert failed",
+      );
 
       // Verify delete was called for meals and plan
       expect(mockFrom).toHaveBeenCalledWith("diet_plan_meals");
@@ -265,19 +308,31 @@ describe("dietPlanStore - Coach Actions", () => {
       const planChain = createChain([], new Error("Plan insert failed"));
       const planSelectMock = vi.fn().mockReturnValue(planChain);
 
-      mockFrom.mockReturnValueOnce({ insert: vi.fn().mockReturnValue({ select: planSelectMock }) });
+      mockFrom.mockReturnValueOnce({
+        insert: vi.fn().mockReturnValue({ select: planSelectMock }),
+      });
 
       const store = useDietPlanStore();
-      await expect(store.createPlan(validPlanData)).rejects.toThrow("Plan insert failed");
+      await expect(store.createPlan(validPlanData)).rejects.toThrow(
+        "Plan insert failed",
+      );
     });
 
     it("validates required fields", async () => {
       const store = useDietPlanStore();
-      
-      await expect(store.createPlan({ ...validPlanData, menteeId: "" })).rejects.toThrow();
-      await expect(store.createPlan({ ...validPlanData, name: "" })).rejects.toThrow();
-      await expect(store.createPlan({ ...validPlanData, startDate: "" })).rejects.toThrow();
-      await expect(store.createPlan({ ...validPlanData, endDate: "" })).rejects.toThrow();
+
+      await expect(
+        store.createPlan({ ...validPlanData, menteeId: "" }),
+      ).rejects.toThrow();
+      await expect(
+        store.createPlan({ ...validPlanData, name: "" }),
+      ).rejects.toThrow();
+      await expect(
+        store.createPlan({ ...validPlanData, startDate: "" }),
+      ).rejects.toThrow();
+      await expect(
+        store.createPlan({ ...validPlanData, endDate: "" }),
+      ).rejects.toThrow();
     });
   });
 
@@ -286,24 +341,51 @@ describe("dietPlanStore - Coach Actions", () => {
       // Mock delete old meals
       const deleteMealsChain = createChain([]);
       const deleteMealsTable = {
-        delete: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue(deleteMealsChain) }),
+        delete: vi
+          .fn()
+          .mockReturnValue({ eq: vi.fn().mockReturnValue(deleteMealsChain) }),
       };
       // Mock new meals insert
-      const mealsChain = createChain([{ id: "new-meal-1", diet_plan_id: "plan-1", name: "Breakfast", display_order: 0 }]);
+      const mealsChain = createChain([
+        {
+          id: "new-meal-1",
+          diet_plan_id: "plan-1",
+          name: "Breakfast",
+          display_order: 0,
+        },
+      ]);
       const mealsSelectMock = vi.fn().mockReturnValue(mealsChain);
       const mealsTable = {
         insert: vi.fn().mockReturnValue({ select: mealsSelectMock }),
       };
       // Mock new items insert
-      const itemsChain = createChain([{ id: "new-item-1", meal_id: "new-meal-1", food_item_id: "food-1", quantity_g: 100, calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 }]);
+      const itemsChain = createChain([
+        {
+          id: "new-item-1",
+          meal_id: "new-meal-1",
+          food_item_id: "food-1",
+          quantity_g: 100,
+          calories: 200,
+          protein_g: 20,
+          carbs_g: 10,
+          fat_g: 8,
+          fiber_g: 3,
+        },
+      ]);
       const itemsSelectMock = vi.fn().mockReturnValue(itemsChain);
       const itemsTable = {
         insert: vi.fn().mockReturnValue({ select: itemsSelectMock }),
       };
       // Mock plan update
-      const planUpdateChain = createChain([{ id: "plan-1", name: "Updated Plan" }]);
+      const planUpdateChain = createChain([
+        { id: "plan-1", name: "Updated Plan" },
+      ]);
       const planUpdateTable = {
-        update: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue(planUpdateChain) }) }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue(planUpdateChain),
+          }),
+        }),
       };
 
       mockFrom
@@ -326,7 +408,13 @@ describe("dietPlanStore - Coach Actions", () => {
               {
                 foodItemId: "123e4567-e89b-12d3-a456-426614174001",
                 quantityG: 100,
-                macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                macros: {
+                  calories: 200,
+                  protein_g: 20,
+                  carbs_g: 10,
+                  fat_g: 8,
+                  fiber_g: 3,
+                },
               },
             ],
           },
@@ -337,15 +425,17 @@ describe("dietPlanStore - Coach Actions", () => {
     });
 
     it("updates plan basic info without meals", async () => {
-      const planUpdateChain = createChain([{ id: "plan-1", name: "Updated Plan" }]);
+      const planUpdateChain = createChain([
+        { id: "plan-1", name: "Updated Plan" },
+      ]);
       const planUpdateTable = {
-        update: vi.fn().mockReturnValue({ 
-          eq: vi.fn().mockReturnValue({ 
-            eq: vi.fn().mockReturnValue(planUpdateChain) 
-          }) 
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue(planUpdateChain),
+          }),
         }),
       };
-      
+
       mockFrom.mockReturnValueOnce(planUpdateTable);
 
       const store = useDietPlanStore();
@@ -359,7 +449,9 @@ describe("dietPlanStore - Coach Actions", () => {
     it("returns false on error", async () => {
       const deleteMealsChain = createChain([], new Error("Delete failed"));
       const deleteMealsTable = {
-        delete: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue(deleteMealsChain) }),
+        delete: vi
+          .fn()
+          .mockReturnValue({ eq: vi.fn().mockReturnValue(deleteMealsChain) }),
       };
       mockFrom.mockReturnValueOnce(deleteMealsTable);
 
@@ -375,10 +467,10 @@ describe("dietPlanStore - Coach Actions", () => {
     it("deletes plan (cascades to meals and items)", async () => {
       const chain = createChain([]);
       const deleteTable = {
-        delete: vi.fn().mockReturnValue({ 
-          eq: vi.fn().mockReturnValue({ 
-            eq: vi.fn().mockReturnValue(chain) 
-          }) 
+        delete: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue(chain),
+          }),
         }),
       };
       mockFrom.mockReturnValue(deleteTable);
@@ -393,10 +485,10 @@ describe("dietPlanStore - Coach Actions", () => {
     it("returns false on error", async () => {
       const chain = createChain([], new Error("Delete failed"));
       const deleteTable = {
-        delete: vi.fn().mockReturnValue({ 
-          eq: vi.fn().mockReturnValue({ 
-            eq: vi.fn().mockReturnValue(chain) 
-          }) 
+        delete: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue(chain),
+          }),
         }),
       };
       mockFrom.mockReturnValue(deleteTable);
@@ -497,7 +589,9 @@ describe("dietPlanStore - Coach Actions", () => {
         fetchProfile: vi.fn().mockResolvedValue(undefined),
       };
 
-      (useProfileStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockProfileStore);
+      (useProfileStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockProfileStore,
+      );
     });
 
     describe("toggleConsumed", () => {
@@ -520,7 +614,13 @@ describe("dietPlanStore - Coach Actions", () => {
                   id: "item-1",
                   food_item_id: "food-1",
                   quantity_g: 100,
-                  macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 },
+                  macros: {
+                    calories: 200,
+                    protein_g: 20,
+                    carbs_g: 10,
+                    fat_g: 8,
+                    fiber_g: 3,
+                  },
                   foodItem: { id: "food-1", name: "Chicken breast" },
                 },
               ],
@@ -576,7 +676,9 @@ describe("dietPlanStore - Coach Actions", () => {
         mockFrom.mockReturnValue({ upsert: upsertMock });
 
         const store = useDietPlanStore();
-        await expect(store.toggleConsumed("item-1", true)).rejects.toThrow("Upsert failed");
+        await expect(store.toggleConsumed("item-1", true)).rejects.toThrow(
+          "Upsert failed",
+        );
       });
     });
 
@@ -596,7 +698,18 @@ describe("dietPlanStore - Coach Actions", () => {
               name: "Breakfast",
               display_order: 0,
               items: [
-                { id: "item-1", food_item_id: "food-1", quantity_g: 100, macros: { calories: 200, protein_g: 20, carbs_g: 10, fat_g: 8, fiber_g: 3 } },
+                {
+                  id: "item-1",
+                  food_item_id: "food-1",
+                  quantity_g: 100,
+                  macros: {
+                    calories: 200,
+                    protein_g: 20,
+                    carbs_g: 10,
+                    fat_g: 8,
+                    fiber_g: 3,
+                  },
+                },
               ],
             },
             {
@@ -604,7 +717,18 @@ describe("dietPlanStore - Coach Actions", () => {
               name: "Lunch",
               display_order: 1,
               items: [
-                { id: "item-2", food_item_id: "food-2", quantity_g: 150, macros: { calories: 300, protein_g: 30, carbs_g: 15, fat_g: 12, fiber_g: 4 } },
+                {
+                  id: "item-2",
+                  food_item_id: "food-2",
+                  quantity_g: 150,
+                  macros: {
+                    calories: 300,
+                    protein_g: 30,
+                    carbs_g: 15,
+                    fat_g: 12,
+                    fiber_g: 4,
+                  },
+                },
               ],
             },
           ],
@@ -621,8 +745,12 @@ describe("dietPlanStore - Coach Actions", () => {
 
         expect(mockFrom).toHaveBeenCalledWith("diet_plan_logs");
         // BUG-001 fix: select must NOT include "macros"
-        expect(selectMock).toHaveBeenCalledWith("id, food_item_id, consumed, consumed_at");
-        expect(selectMock).not.toHaveBeenCalledWith("id, food_item_id, consumed, consumed_at, macros");
+        expect(selectMock).toHaveBeenCalledWith(
+          "id, food_item_id, consumed, consumed_at",
+        );
+        expect(selectMock).not.toHaveBeenCalledWith(
+          "id, food_item_id, consumed, consumed_at, macros",
+        );
       });
 
       it("returns empty logs when no food items in plan", async () => {

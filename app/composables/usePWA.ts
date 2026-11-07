@@ -26,10 +26,7 @@ export function usePWA() {
    * Register the service worker at /sw.js.
    */
   async function registerServiceWorker() {
-    if (
-      typeof window === "undefined" ||
-      !("serviceWorker" in navigator)
-    ) {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
       return null;
     }
     try {
@@ -48,10 +45,7 @@ export function usePWA() {
       deferredPrompt = event as InstallPromptEvent;
       isInstalled.value = false;
     };
-    window.addEventListener(
-      "beforeinstallprompt",
-      handleBeforeInstallPrompt,
-    );
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     // Register the shell-caching service worker so the app works offline.
     registerServiceWorker();
   }
@@ -62,8 +56,9 @@ export function usePWA() {
   async function installApp(): Promise<boolean> {
     if (!deferredPrompt) return false;
     await deferredPrompt.prompt?.();
-    const { outcome } =
-      (await deferredPrompt.userChoice?.()) ?? { outcome: "dismissed" };
+    const { outcome } = (await deferredPrompt.userChoice?.()) ?? {
+      outcome: "dismissed",
+    };
     deferredPrompt = null;
     isInstalled.value = outcome === "accepted";
     return isInstalled.value;

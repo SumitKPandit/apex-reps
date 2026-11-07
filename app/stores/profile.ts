@@ -51,7 +51,10 @@ export const useProfileStore = defineStore("profile", {
 
         if (error) throw error;
 
-        const typedData = (data ?? []) as unknown as Array<{ id: string; name: string }>;
+        const typedData = (data ?? []) as unknown as Array<{
+          id: string;
+          name: string;
+        }>;
 
         return typedData.map((m) => ({
           id: m.id,

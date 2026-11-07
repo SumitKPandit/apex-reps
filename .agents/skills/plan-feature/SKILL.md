@@ -30,13 +30,13 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 ## Modes
 
-| Mode      | Scope                          | Output                    |
-| --------- | ------------------------------ | ------------------------- |
-| `feature` | Full feature (default)         | plan.md + decisions.md + handoff.json |
-| `bugfix`  | Root cause + minimal fix       | plan.md (minimal) + decisions.md + handoff.json |
-| `refactor`| Impact analysis + incremental  | plan.md + decisions.md + handoff.json |
-| `config`  | Config change only             | handoff.json (no plan.md) |
-| `docs`    | Documentation only             | plan.md (docs only) + handoff.json |
+| Mode       | Scope                         | Output                                          |
+| ---------- | ----------------------------- | ----------------------------------------------- |
+| `feature`  | Full feature (default)        | plan.md + decisions.md + handoff.json           |
+| `bugfix`   | Root cause + minimal fix      | plan.md (minimal) + decisions.md + handoff.json |
+| `refactor` | Impact analysis + incremental | plan.md + decisions.md + handoff.json           |
+| `config`   | Config change only            | handoff.json (no plan.md)                       |
+| `docs`     | Documentation only            | plan.md (docs only) + handoff.json              |
 
 ---
 
@@ -146,11 +146,11 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 ## Step 4: Design Test Plan (Test-First)
 
-| Test Type       | Scope                                 | Written By     | Verified By                    |
-| --------------- | ------------------------------------- | -------------- | ------------------------------ |
-| **Unit**        | Pure functions, utils, calculations   | implement-task | implement-task (quality gates) |
-| **Integration** | Store actions, API calls, composables | implement-task | implement-task (quality gates) |
-| **QA (Black-box)** | Full user flows, auth, navigation   | verify-qa      | verify-qa (qa-report.md)       |
+| Test Type          | Scope                                 | Written By     | Verified By                    |
+| ------------------ | ------------------------------------- | -------------- | ------------------------------ |
+| **Unit**           | Pure functions, utils, calculations   | implement-task | implement-task (quality gates) |
+| **Integration**    | Store actions, API calls, composables | implement-task | implement-task (quality gates) |
+| **QA (Black-box)** | Full user flows, auth, navigation     | verify-qa      | verify-qa (qa-report.md)       |
 
 **Test plan in plan.md:**
 
@@ -188,11 +188,11 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 **Gate Level Auto-Assignment (via DAG):**
 
-| Level    | Criteria (DAG position)     | Gates                              |
-| -------- | --------------------------- | ---------------------------------- |
-| `strict` | Root (no dependencies)      | All: typecheck, lint, unit, integration, build |
-| `standard` | Intermediate (has deps + dependents) | typecheck + lint + unit |
-| `light`  | Leaf (no dependents)        | typecheck + lint only              |
+| Level      | Criteria (DAG position)              | Gates                                          |
+| ---------- | ------------------------------------ | ---------------------------------------------- |
+| `strict`   | Root (no dependencies)               | All: typecheck, lint, unit, integration, build |
+| `standard` | Intermediate (has deps + dependents) | typecheck + lint + unit                        |
+| `light`    | Leaf (no dependents)                 | typecheck + lint only                          |
 
 **Task template (in plan.md):**
 
@@ -236,11 +236,11 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 **Location:** `ai-workspace/changes/<issue-id>-<short-slug>/`
 
-| File          | Purpose                                  |
-| ------------- | ---------------------------------------- |
-| `plan.md`     | Scope, tasks, test plan, risks           |
+| File           | Purpose                                    |
+| -------------- | ------------------------------------------ |
+| `plan.md`      | Scope, tasks, test plan, risks             |
 | `decisions.md` | Resolved decisions (id, choice, rationale) |
-| `handoff.json` | Machine-readable handoff for next phase  |
+| `handoff.json` | Machine-readable handoff for next phase    |
 
 **handoff.json schema:** `./schemas/handoff.schema.json`
 
@@ -262,12 +262,12 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 ### Supporting Utilities (Local)
 
-| Utility | Purpose |
-| ------- | ------- |
-| `./utils/dag.ts` | DAG analyzer for gate_level auto-assignment |
-| `./utils/summarize.ts` | Smart context summarizer (preserves types/decisions/errors) |
-| `./schemas/handoff.schema.json` | Validates handoff.json structure |
-| `./schemas/decision_request.schema.json` | Validates decision requests |
+| Utility                                  | Purpose                                                     |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| `./utils/dag.ts`                         | DAG analyzer for gate_level auto-assignment                 |
+| `./utils/summarize.ts`                   | Smart context summarizer (preserves types/decisions/errors) |
+| `./schemas/handoff.schema.json`          | Validates handoff.json structure                            |
+| `./schemas/decision_request.schema.json` | Validates decision requests                                 |
 
 ## Handoff to implement-task
 

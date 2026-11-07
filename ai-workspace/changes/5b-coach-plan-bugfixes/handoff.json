@@ -12,9 +12,7 @@
       "Fix edit page loading/error handling (`finally` block, redirect to list)",
       "Verify save error toasts surface on plan save failure"
     ],
-    "out": [
-      "Adding `macros` column to `diet_plan_logs` via migration"
-    ]
+    "out": ["Adding `macros` column to `diet_plan_logs` via migration"]
   },
   "decisions": [
     {
@@ -84,7 +82,9 @@
       "done": true,
       "description": "Remove `watch` with `deep: true` that auto-called `savePlan()` after initial plan data population, causing immediate redirect to list page",
       "files": ["app/pages/coach/diet-plans/[id]/edit.vue"],
-      "tests": ["QA: coach navigates to Edit page, page stays loaded with plan data"],
+      "tests": [
+        "QA: coach navigates to Edit page, page stays loaded with plan data"
+      ],
       "verification": "Edit page loads and displays plan data without redirecting",
       "rollback": "Re-add watch block"
     },
@@ -110,7 +110,9 @@
       "done": true,
       "description": "Confirm savePlan catch block shows user-facing toast (present at line 169 of new.vue)",
       "files": ["app/pages/coach/diet-plans/new.vue"],
-      "tests": ["QA: Attempt save with conflicting date -> error toast appears"],
+      "tests": [
+        "QA: Attempt save with conflicting date -> error toast appears"
+      ],
       "verification": "Error toast visible when save fails",
       "rollback": "N/A (verification only)"
     }

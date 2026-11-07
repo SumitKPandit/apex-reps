@@ -19,15 +19,15 @@
 
 ### Reusable Patterns Found
 
-| Pattern | Location | Reuse For |
-|---------|----------|-----------|
-| Transactional multi-table insert | `app/stores/stats.ts` (`insertStat`) | `dietPlanStore.createPlan` |
-| Pinia store with Supabase | `app/stores/foodItem.ts`, `app/stores/dietPlan.ts` | Coach CRUD actions |
-| Autocomplete food search | `app/components/diet-plan/FoodSelector.vue` | Meal builder |
-| Custom food creation | `app/components/diet-plan/CustomFoodModal.vue` | Meal builder |
-| Macro calculation | `app/utils/foodMacros.ts` (`calculateMacros`, `sumMacros`) | Meal totals |
-| Zod validation + toast | `app/components/diet-plan/CustomFoodModal.vue` | Plan form validation |
-| Role-based routing guard | `app/middleware/auth.global.ts`, pages | Coach-only pages |
+| Pattern                          | Location                                                   | Reuse For                  |
+| -------------------------------- | ---------------------------------------------------------- | -------------------------- |
+| Transactional multi-table insert | `app/stores/stats.ts` (`insertStat`)                       | `dietPlanStore.createPlan` |
+| Pinia store with Supabase        | `app/stores/foodItem.ts`, `app/stores/dietPlan.ts`         | Coach CRUD actions         |
+| Autocomplete food search         | `app/components/diet-plan/FoodSelector.vue`                | Meal builder               |
+| Custom food creation             | `app/components/diet-plan/CustomFoodModal.vue`             | Meal builder               |
+| Macro calculation                | `app/utils/foodMacros.ts` (`calculateMacros`, `sumMacros`) | Meal totals                |
+| Zod validation + toast           | `app/components/diet-plan/CustomFoodModal.vue`             | Plan form validation       |
+| Role-based routing guard         | `app/middleware/auth.global.ts`, pages                     | Coach-only pages           |
 
 ### Existing Types to Extend
 
@@ -37,27 +37,27 @@
 
 ### Placement Decisions
 
-| New Code | Expected Location | Reason |
-|----------|-------------------|--------|
-| Coach CRUD actions | `app/stores/dietPlan.ts` | Extends existing store (follows statsStore pattern) |
-| Mentee fetching | `app/stores/profile.ts` or new `coach.ts` | Profile store already fetches profile; new action for coach's mentees |
-| Create plan page | `app/pages/coach/diet-plans/new.vue` | Already exists, needs backend integration |
-| Edit plan page | `app/pages/coach/diet-plans/[id]/edit.vue` | New file |
-| List page enhancements | `app/pages/coach/diet-plans.vue` | Already exists, needs real data |
+| New Code               | Expected Location                          | Reason                                                                |
+| ---------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
+| Coach CRUD actions     | `app/stores/dietPlan.ts`                   | Extends existing store (follows statsStore pattern)                   |
+| Mentee fetching        | `app/stores/profile.ts` or new `coach.ts`  | Profile store already fetches profile; new action for coach's mentees |
+| Create plan page       | `app/pages/coach/diet-plans/new.vue`       | Already exists, needs backend integration                             |
+| Edit plan page         | `app/pages/coach/diet-plans/[id]/edit.vue` | New file                                                              |
+| List page enhancements | `app/pages/coach/diet-plans.vue`           | Already exists, needs real data                                       |
 
 ---
 
 ## Decisions Needed (Resolved in decisions.md)
 
-| ID | Decision | Status |
-|----|----------|--------|
-| 1 | Mentee list source: profiles with role='mentee' AND coach_id = current user | Resolved |
-| 2 | Plan list view: group by mentee or flat list? | Resolved: Group by mentee |
-| 3 | Edit page: separate route `/coach/diet-plans/:id/edit` | Resolved |
-| 4 | Meal ordering: `display_order` managed by drag-drop or fixed order? | Resolved: Fixed order (Breakfast=0, Lunch=1, Dinner=2, Snacks=3+) |
-| 5 | Unique constraint (mentee_id, start_date): client-side check or server error? | Resolved: Client-side warning + server error handling |
-| 6 | Coach notes field: include in create/edit? | Resolved: Yes, optional textarea |
-| 7 | Validation: Zod schema for plan form | Resolved: Yes |
+| ID  | Decision                                                                      | Status                                                            |
+| --- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 1   | Mentee list source: profiles with role='mentee' AND coach_id = current user   | Resolved                                                          |
+| 2   | Plan list view: group by mentee or flat list?                                 | Resolved: Group by mentee                                         |
+| 3   | Edit page: separate route `/coach/diet-plans/:id/edit`                        | Resolved                                                          |
+| 4   | Meal ordering: `display_order` managed by drag-drop or fixed order?           | Resolved: Fixed order (Breakfast=0, Lunch=1, Dinner=2, Snacks=3+) |
+| 5   | Unique constraint (mentee_id, start_date): client-side check or server error? | Resolved: Client-side warning + server error handling             |
+| 6   | Coach notes field: include in create/edit?                                    | Resolved: Yes, optional textarea                                  |
+| 7   | Validation: Zod schema for plan form                                          | Resolved: Yes                                                     |
 
 ---
 
@@ -92,16 +92,19 @@
 ## Tasks (Ordered by Dependency)
 
 ### Task 1: Extend dietPlanStore with Coach CRUD Actions
+
 **Type:** store  
 **Depends on:** none  
-**Gate Level:** strict  
+**Gate Level:** strict
 
 **Description:** Add coach-facing actions to existing `useDietPlanStore`: `fetchMentees`, `fetchCoachPlans`, `createPlan`, `updatePlan`, `deletePlan`. Transactional insert for plan + meals + food_items (mirrors `statsStore.insertStat`).
 
 **Files to create/modify:**
+
 - `app/stores/dietPlan.ts` — Add actions, types for coach plan summary
 
 **Test first:**
+
 - [ ] Unit: `createPlan` input validation
 - [ ] Integration: `createPlan` inserts 3 tables atomically
 - [ ] Integration: `fetchCoachPlans` returns correct structure
@@ -115,16 +118,19 @@
 ---
 
 ### Task 2: Enhance List Page (`/coach/diet-plans.vue`)
+
 **Type:** page  
 **Depends on:** Task 1  
-**Gate Level:** standard  
+**Gate Level:** standard
 
 **Description:** Replace mock data with real `fetchMentees` + `fetchCoachPlans`. Show mentees grouped with their plans. Each plan shows: name, date range, status badge (active/upcoming/expired), actions (View, Edit). "Create New Plan" button navigates to `/coach/diet-plans/new`.
 
 **Files to create/modify:**
+
 - `app/pages/coach/diet-plans.vue` — Replace mock with store calls, add plan list rendering
 
 **Test first:**
+
 - [ ] Integration: Page loads mentees + plans from store
 - [ ] Unit: Status badge logic (active/upcoming/expired based on date)
 
@@ -135,16 +141,19 @@
 ---
 
 ### Task 3: Create Plan Page — Backend Integration (`/coach/diet-plans/new.vue`)
+
 **Type:** page  
 **Depends on:** Task 1  
-**Gate Level:** strict  
+**Gate Level:** strict
 
 **Description:** Replace mock save with `dietPlanStore.createPlan`. Add Zod validation schema for plan form. Connect FoodSelector to meal builder (already wired). Meal macros display using `sumMacros`. On success, redirect to list with toast.
 
 **Files to create/modify:**
+
 - `app/pages/coach/diet-plans/new.vue` — Replace mock save, add validation, toast
 
 **Test first:**
+
 - [ ] Unit: Zod schema validates required fields, date logic
 - [ ] Integration: Submit creates plan + meals + items in DB
 - [ ] Integration: Meal macros display correctly
@@ -156,17 +165,20 @@
 ---
 
 ### Task 4: Edit Plan Page (`/coach/diet-plans/[id]/edit.vue`)
+
 **Type:** page  
 **Depends on:** Task 1, Task 3  
-**Gate Level:** standard  
+**Gate Level:** standard
 
 **Description:** New page. Fetch plan with meals/items via `dietPlanStore.fetchPlanForEdit(id)` (new action). Pre-populate form. Same meal builder as create. On save, call `updatePlan` (delete old meals/items, insert new). On delete, call `deletePlan` with confirmation.
 
 **Files to create/modify:**
+
 - `app/pages/coach/diet-plans/[id]/edit.vue` — New file
 - `app/stores/dietPlan.ts` — Add `fetchPlanForEdit` action
 
 **Test first:**
+
 - [ ] Integration: `fetchPlanForEdit` loads full plan structure
 - [ ] Integration: `updatePlan` replaces meals/items correctly
 - [ ] Integration: `deletePlan` removes plan + cascades
@@ -178,16 +190,19 @@
 ---
 
 ### Task 5: Add Coach Mentee Fetching to Profile Store (or new store)
+
 **Type:** store  
 **Depends on:** Task 1  
-**Gate Level:** light  
+**Gate Level:** light
 
 **Description:** Add `fetchMyMentees()` to `useProfileStore` (or create `useCoachStore`). Query `profiles` where `role = 'mentee'` AND `coach_id = auth.uid()`. Used by create/edit pages for mentee dropdown.
 
 **Files to create/modify:**
+
 - `app/stores/profile.ts` — Add `fetchMyMentees` action
 
 **Test first:**
+
 - [ ] Integration: Returns only coach's mentees
 
 **Verification:** Mentee dropdown shows correct names.
@@ -197,16 +212,19 @@
 ---
 
 ### Task 6: Unit Tests for Macro Utilities
+
 **Type:** test  
 **Depends on:** none  
-**Gate Level:** strict  
+**Gate Level:** strict
 
 **Description:** Add Vitest unit tests for `calculateMacros` and `sumMacros` in `app/utils/foodMacros.ts`.
 
 **Files to create/modify:**
+
 - `tests/unit/foodMacros.spec.ts` — New file
 
 **Test first:**
+
 - [ ] `calculateMacros` scales correctly for various quantities
 - [ ] `calculateMacros` throws on quantity <= 0
 - [ ] `sumMacros` aggregates multiple items
@@ -222,12 +240,12 @@
 
 ## Risk Assessment & Rollback
 
-| Risk | Likelihood | Impact | Mitigation | Rollback |
-|------|------------|--------|------------|----------|
-| RLS blocks coach actions | Low | High | Test as coach + mentee locally | Disable policy, fix, re-enable |
-| Unique constraint violation | Medium | Medium | Client check + server error handling | Show toast, keep form data |
-| Transactional insert partial failure | Low | High | Use Supabase RPC or sequential with cleanup | Delete orphaned rows manually |
-| FoodSelector not emitting correct macros | Low | Medium | Already tested in Story 2 | Debug FoodSelector emit |
+| Risk                                     | Likelihood | Impact | Mitigation                                  | Rollback                       |
+| ---------------------------------------- | ---------- | ------ | ------------------------------------------- | ------------------------------ |
+| RLS blocks coach actions                 | Low        | High   | Test as coach + mentee locally              | Disable policy, fix, re-enable |
+| Unique constraint violation              | Medium     | Medium | Client check + server error handling        | Show toast, keep form data     |
+| Transactional insert partial failure     | Low        | High   | Use Supabase RPC or sequential with cleanup | Delete orphaned rows manually  |
+| FoodSelector not emitting correct macros | Low        | Medium | Already tested in Story 2                   | Debug FoodSelector emit        |
 
 ---
 

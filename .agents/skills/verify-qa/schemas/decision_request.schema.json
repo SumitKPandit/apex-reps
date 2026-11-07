@@ -6,7 +6,11 @@
   "properties": {
     "id": { "type": "string" },
     "question": { "type": "string" },
-    "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+    "options": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 2
+    },
     "impact": { "type": "string" },
     "recommendation": { "type": "string" },
     "threshold": { "type": "string", "enum": ["architectural", "tactical"] },

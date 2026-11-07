@@ -34,9 +34,14 @@ function getInitials(name: string) {
   <div class="flex min-h-screen flex-col overflow-x-hidden">
     <UHeader :toggle="false">
       <template #left>
-        <NuxtLink to="/coach" class="flex items-center gap-2 focus-visible:outline-3 outline-primary/25 rounded-md p-1 -ms-1">
+        <NuxtLink
+          to="/coach"
+          class="flex items-center gap-2 focus-visible:outline-3 outline-primary/25 rounded-md p-1 -ms-1"
+        >
           <AppLogo class="w-auto h-6 shrink-0" />
-          <span class="font-semibold text-lg hidden sm:block">Coach Portal</span>
+          <span class="font-semibold text-lg hidden sm:block"
+            >Coach Portal</span
+          >
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-1 ms-4">
@@ -55,10 +60,20 @@ function getInitials(name: string) {
       <template #right>
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-medium text-sm">
-              {{ getInitials(authStore.user?.user_metadata?.name || authStore.user?.email || "U") }}
+            <div
+              class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-medium text-sm"
+            >
+              {{
+                getInitials(
+                  authStore.user?.user_metadata?.name ||
+                    authStore.user?.email ||
+                    "U",
+                )
+              }}
             </div>
-            <span class="hidden sm:block text-sm font-medium">{{ authStore.user?.user_metadata?.name || "Coach" }}</span>
+            <span class="hidden sm:block text-sm font-medium">{{
+              authStore.user?.user_metadata?.name || "Coach"
+            }}</span>
           </div>
           <UButton
             :loading="isLoading"

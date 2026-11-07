@@ -10,6 +10,7 @@
 **Context:** `toggleConsumed` upserts `macros` into `diet_plan_logs`, `fetchLogs` selects `macros` from it, and `DietPlanLog` type declares `macros?: CalculatedMacros`. But `diet_plan_logs` has no `macros` column — macros live on `diet_plan_food_items`.
 
 **Choice:** Remove all `macros` references from `diet_plan_logs` operations:
+
 - Remove `macros` from `toggleConsumed` upsert payload
 - Remove `macros` from `fetchLogs` select
 - Remove `macros?: CalculatedMacros` from `DietPlanLog` interface
@@ -60,10 +61,10 @@
 
 ## Summary Table
 
-| ID | Decision | Choice |
-|----|----------|--------|
-| 1 | BUG-001 fix approach | Remove `macros` from `diet_plan_logs` operations (no migration) |
-| 2 | BUG-005 upsert conflict | Add `onConflict: "mentee_id, food_item_id, log_date"` |
-| 3 | BUG-006 auth token | Store `accessToken` in authState, use in `getSupabase(true)` |
-| 4 | BUG-007 auto-save watch | Remove auto-save watch from edit page |
-| 5 | BUG-008 loading/error | `try/catch/finally` with loading dismiss + redirect to list |
+| ID  | Decision                | Choice                                                          |
+| --- | ----------------------- | --------------------------------------------------------------- |
+| 1   | BUG-001 fix approach    | Remove `macros` from `diet_plan_logs` operations (no migration) |
+| 2   | BUG-005 upsert conflict | Add `onConflict: "mentee_id, food_item_id, log_date"`           |
+| 3   | BUG-006 auth token      | Store `accessToken` in authState, use in `getSupabase(true)`    |
+| 4   | BUG-007 auto-save watch | Remove auto-save watch from edit page                           |
+| 5   | BUG-008 loading/error   | `try/catch/finally` with loading dismiss + redirect to list     |

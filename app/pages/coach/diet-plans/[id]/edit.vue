@@ -34,7 +34,11 @@ const notes = ref("");
 // Date ranges already assigned to this mentee (excluding the plan being edited)
 const menteePlanRanges = ref<Map<string, string>>(new Map());
 
-function isDateWithinRange(dateStr: string, rangeStart: string, rangeEnd: string) {
+function isDateWithinRange(
+  dateStr: string,
+  rangeStart: string,
+  rangeEnd: string,
+) {
   return dateStr >= rangeStart && dateStr <= rangeEnd;
 }
 
@@ -48,9 +52,7 @@ function isStartDateBlocked(dateStr: string) {
 function getBlockedDateNotice() {
   const ranges = Array.from(menteePlanRanges.value.entries());
   if (ranges.length === 0) return "";
-  const notice = ranges
-    .map(([start, end]) => `${start} to ${end}`)
-    .join(", ");
+  const notice = ranges.map(([start, end]) => `${start} to ${end}`).join(", ");
   return `This mentee already has plans assigned for: ${notice}. Please choose a start date outside these ranges.`;
 }
 
@@ -82,7 +84,9 @@ interface MealItem {
   };
 }
 
-const meals = ref<{ id: string; name: string; displayOrder: number; items: MealItem[] }[]>([]);
+const meals = ref<
+  { id: string; name: string; displayOrder: number; items: MealItem[] }[]
+>([]);
 const snackCount = ref(0);
 
 function getMealTotalMacros(meal: { items: MealItem[] }) {
@@ -200,7 +204,21 @@ function removeMeal(mealId: string) {
   meals.value = meals.value.filter((m) => m.id !== mealId);
 }
 
-function handleFoodSelected(event: { foodItemId: string; foodName: string; quantityG: number; macros: { calories: number; protein_g: number; carbs_g: number; fat_g: number; fiber_g: number } }, mealId: string) {
+function handleFoodSelected(
+  event: {
+    foodItemId: string;
+    foodName: string;
+    quantityG: number;
+    macros: {
+      calories: number;
+      protein_g: number;
+      carbs_g: number;
+      fat_g: number;
+      fiber_g: number;
+    };
+  },
+  mealId: string,
+) {
   const meal = meals.value.find((m) => m.id === mealId);
   if (!meal) return;
 
@@ -230,7 +248,9 @@ async function savePlan() {
   if (isStartDateBlocked(startDate.value)) {
     toast.add({
       title: "Cannot update plan for these dates",
-      description: getBlockedDateNotice() || "This mentee already has a plan assigned for the selected start date. Please choose a different date.",
+      description:
+        getBlockedDateNotice() ||
+        "This mentee already has a plan assigned for the selected start date. Please choose a different date.",
       color: "error",
     });
     return;
@@ -238,7 +258,10 @@ async function savePlan() {
 
   const mealsWithItems = meals.value.filter((m) => m.items.length > 0);
   if (mealsWithItems.length === 0) {
-    toast.add({ title: "Please add at least one food item to a meal", color: "error" });
+    toast.add({
+      title: "Please add at least one food item to a meal",
+      color: "error",
+    });
     return;
   }
 
@@ -265,15 +288,23 @@ async function savePlan() {
       toast.add({ title: "Plan updated successfully", color: "success" });
       router.push("/coach/diet-plans");
     } else {
-      toast.add({ title: dietPlanStore.error || "Failed to update plan", color: "error" });
+      toast.add({
+        title: dietPlanStore.error || "Failed to update plan",
+        color: "error",
+      });
     }
   } catch (err) {
     console.error("Failed to update plan:", err);
-    const message = err instanceof Error ? err.message : "Failed to update plan";
-    if (message.includes("unique constraint") || message.includes("duplicate key")) {
+    const message =
+      err instanceof Error ? err.message : "Failed to update plan";
+    if (
+      message.includes("unique constraint") ||
+      message.includes("duplicate key")
+    ) {
       toast.add({
         title: "Plan already exists for this date",
-        description: "This mentee already has a plan starting on the selected date. Please choose a different start date.",
+        description:
+          "This mentee already has a plan starting on the selected date. Please choose a different start date.",
         color: "error",
       });
     } else {
@@ -285,7 +316,11 @@ async function savePlan() {
 }
 
 async function deletePlan() {
-  if (!confirm("Are you sure you want to delete this plan? This action cannot be undone.")) {
+  if (
+    !confirm(
+      "Are you sure you want to delete this plan? This action cannot be undone.",
+    )
+  ) {
     return;
   }
 
@@ -296,11 +331,17 @@ async function deletePlan() {
       toast.add({ title: "Plan deleted successfully", color: "success" });
       router.push("/coach/diet-plans");
     } else {
-      toast.add({ title: dietPlanStore.error || "Failed to delete plan", color: "error" });
+      toast.add({
+        title: dietPlanStore.error || "Failed to delete plan",
+        color: "error",
+      });
     }
   } catch (err) {
     console.error("Failed to delete plan:", err);
-    toast.add({ title: err instanceof Error ? err.message : "Failed to delete plan", color: "error" });
+    toast.add({
+      title: err instanceof Error ? err.message : "Failed to delete plan",
+      color: "error",
+    });
   } finally {
     deleting.value = false;
   }
@@ -310,78 +351,157 @@ async function deletePlan() {
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div v-if="loading" class="flex items-center justify-center min-h-screen">
-      <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent" />
+      <div
+        class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"
+      />
     </div>
 
-    <div v-else-if="profileStore.role === 'coach'" class="max-w-4xl mx-auto px-4 py-8">
+    <div
+      v-else-if="profileStore.role === 'coach'"
+      class="max-w-4xl mx-auto px-4 py-8"
+    >
       <div class="mb-8 flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Edit Diet Plan</h1>
-          <p class="text-gray-600 dark:text-gray-400 mt-1">Modify the nutrition plan for your mentee</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Edit Diet Plan
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-1">
+            Modify the nutrition plan for your mentee
+          </p>
         </div>
-        <button @click="router.push('/coach/diet-plans')" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+        <button
+          @click="router.push('/coach/diet-plans')"
+          class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+        >
           Back
         </button>
       </div>
 
       <form @submit.prevent="savePlan" class="space-y-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+        >
           <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Mentee <span class="text-red-500">*</span>
               </label>
-              <select :value="mentees[0]?.id" disabled class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                <option v-for="m in mentees" :key="m.id" :value="m.id">{{ m.name }}</option>
+              <select
+                :value="mentees[0]?.id"
+                disabled
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option v-for="m in mentees" :key="m.id" :value="m.id">
+                  {{ m.name }}
+                </option>
               </select>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mentee cannot be changed for existing plans</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Mentee cannot be changed for existing plans
+              </p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Plan Name <span class="text-red-500">*</span>
               </label>
-              <input v-model="planName" placeholder="e.g., Cutting Phase Week 1" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input
+                v-model="planName"
+                placeholder="e.g., Cutting Phase Week 1"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Start Date <span class="text-red-500">*</span>
               </label>
-              <input v-model="startDate" type="date" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-              <p v-if="getBlockedDateNotice()" class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              <input
+                v-model="startDate"
+                type="date"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <p
+                v-if="getBlockedDateNotice()"
+                class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+              >
                 {{ getBlockedDateNotice() }}
               </p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 End Date <span class="text-red-500">*</span>
               </label>
-              <input v-model="endDate" type="date" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input
+                v-model="endDate"
+                type="date"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Coach Notes (Optional)
               </label>
-              <textarea v-model="notes" rows="3" placeholder="Add any notes for this plan..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <textarea
+                v-model="notes"
+                rows="3"
+                placeholder="Add any notes for this plan..."
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+        >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold">Meals</h2>
-            <button @click="addSnack" type="button" class="px-3 py-1 text-sm bg-primary-600 text-white rounded hover:bg-primary-700">Add Snack</button>
+            <button
+              @click="addSnack"
+              type="button"
+              class="px-3 py-1 text-sm bg-primary-600 text-white rounded hover:bg-primary-700"
+            >
+              Add Snack
+            </button>
           </div>
 
           <div class="space-y-6">
-            <div v-for="meal in meals" :key="meal.id" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div
+              v-for="meal in meals"
+              :key="meal.id"
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+            >
               <div class="flex items-center justify-between mb-4">
-                <h3 class="font-medium text-gray-900 dark:text-gray-100 capitalize">{{ meal.name }}</h3>
+                <h3
+                  class="font-medium text-gray-900 dark:text-gray-100 capitalize"
+                >
+                  {{ meal.name }}
+                </h3>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-gray-500 dark:text-gray-400">
-                    Total: {{ getMealTotalMacros(meal).calories }} cal • {{ getMealTotalMacros(meal).protein_g }}g protein
+                    Total: {{ getMealTotalMacros(meal).calories }} cal •
+                    {{ getMealTotalMacros(meal).protein_g }}g protein
                   </span>
-                  <button v-if="meal.name.startsWith('Snack ')" @click="removeMeal(meal.id)" type="button" class="px-2 py-1 text-sm text-red-600 hover:text-red-700">Remove</button>
+                  <button
+                    v-if="meal.name.startsWith('Snack ')"
+                    @click="removeMeal(meal.id)"
+                    type="button"
+                    class="px-2 py-1 text-sm text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
 
@@ -391,56 +511,101 @@ async function deletePlan() {
               />
 
               <div v-if="meal.items.length > 0" class="mt-4 space-y-2">
-                <div v-for="item in meal.items" :key="item.id" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div
+                  v-for="item in meal.items"
+                  :key="item.id"
+                  class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
                   <div class="flex-1">
-                    <p class="font-medium text-gray-900 dark:text-gray-100">{{ item.foodName }}</p>
+                    <p class="font-medium text-gray-900 dark:text-gray-100">
+                      {{ item.foodName }}
+                    </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ item.quantityG }}g • {{ item.macros.calories }} cal • P: {{ item.macros.protein_g }}g • C: {{ item.macros.carbs_g }}g • F: {{ item.macros.fat_g }}g • Fib: {{ item.macros.fiber_g }}g
+                      {{ item.quantityG }}g • {{ item.macros.calories }} cal •
+                      P: {{ item.macros.protein_g }}g • C:
+                      {{ item.macros.carbs_g }}g • F: {{ item.macros.fat_g }}g •
+                      Fib: {{ item.macros.fiber_g }}g
                     </p>
                   </div>
-                  <button @click="removeFoodItem(meal.id, item.id)" type="button" class="px-2 py-1 text-sm text-red-600 hover:text-red-700">Remove</button>
+                  <button
+                    @click="removeFoodItem(meal.id, item.id)"
+                    type="button"
+                    class="px-2 py-1 text-sm text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
-              <div v-else class="text-center text-gray-500 dark:text-gray-400 py-4">
+              <div
+                v-else
+                class="text-center text-gray-500 dark:text-gray-400 py-4"
+              >
                 No foods added yet. Search above to add items.
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
+        >
           <h3 class="font-semibold mb-2">Daily Totals</h3>
           <div class="grid grid-cols-5 gap-2 text-sm">
             <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-              <div class="font-bold text-gray-900 dark:text-gray-100">{{ getDailyTotalMacros().calories }}</div>
+              <div class="font-bold text-gray-900 dark:text-gray-100">
+                {{ getDailyTotalMacros().calories }}
+              </div>
               <div class="text-gray-500 dark:text-gray-400">Calories</div>
             </div>
             <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-              <div class="font-bold text-gray-900 dark:text-gray-100">{{ getDailyTotalMacros().protein_g }}</div>
+              <div class="font-bold text-gray-900 dark:text-gray-100">
+                {{ getDailyTotalMacros().protein_g }}
+              </div>
               <div class="text-gray-500 dark:text-gray-400">Protein (g)</div>
             </div>
             <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-              <div class="font-bold text-gray-900 dark:text-gray-100">{{ getDailyTotalMacros().carbs_g }}</div>
+              <div class="font-bold text-gray-900 dark:text-gray-100">
+                {{ getDailyTotalMacros().carbs_g }}
+              </div>
               <div class="text-gray-500 dark:text-gray-400">Carbs (g)</div>
             </div>
             <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-              <div class="font-bold text-gray-900 dark:text-gray-100">{{ getDailyTotalMacros().fat_g }}</div>
+              <div class="font-bold text-gray-900 dark:text-gray-100">
+                {{ getDailyTotalMacros().fat_g }}
+              </div>
               <div class="text-gray-500 dark:text-gray-400">Fat (g)</div>
             </div>
             <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-              <div class="font-bold text-gray-900 dark:text-gray-100">{{ getDailyTotalMacros().fiber_g }}</div>
+              <div class="font-bold text-gray-900 dark:text-gray-100">
+                {{ getDailyTotalMacros().fiber_g }}
+              </div>
               <div class="text-gray-500 dark:text-gray-400">Fiber (g)</div>
             </div>
           </div>
         </div>
 
         <div class="flex justify-between">
-          <button @click="deletePlan" :disabled="deleting" type="button" class="px-4 py-2 text-red-600 hover:text-red-700 font-medium disabled:opacity-50">
+          <button
+            @click="deletePlan"
+            :disabled="deleting"
+            type="button"
+            class="px-4 py-2 text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
+          >
             {{ deleting ? "Deleting..." : "Delete Plan" }}
           </button>
           <div class="flex gap-3">
-            <button @click="router.push('/coach/diet-plans')" type="button" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">Cancel</button>
-            <button type="submit" :disabled="saving" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            <button
+              @click="router.push('/coach/diet-plans')"
+              type="button"
+              class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="saving"
+              class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+            >
               {{ saving ? "Saving..." : "Save Changes" }}
             </button>
           </div>
@@ -449,15 +614,38 @@ async function deletePlan() {
     </div>
 
     <div v-else class="flex items-center justify-center min-h-screen">
-      <div class="max-w-md text-center bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl">
-        <div class="mx-auto mb-4 w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-          <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      <div
+        class="max-w-md text-center bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl"
+      >
+        <div
+          class="mx-auto mb-4 w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center"
+        >
+          <svg
+            class="w-8 h-8 text-red-600 dark:text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Access Denied</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">This page is only accessible to coaches.</p>
-        <button @click="router.push('/')" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Go to Dashboard</button>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          Access Denied
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+          This page is only accessible to coaches.
+        </p>
+        <button
+          @click="router.push('/')"
+          class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+        >
+          Go to Dashboard
+        </button>
       </div>
     </div>
   </div>

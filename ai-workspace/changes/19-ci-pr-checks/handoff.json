@@ -1,0 +1,112 @@
+{
+  "issue_id": "19",
+  "mode": "config",
+  "scope": {
+    "in": [
+      "Add pull_request trigger to .github/workflows/ci.yml targeting main",
+      "Add concurrency group to cancel stale PR runs",
+      "Add unit test step (pnpm test:unit) to CI",
+      "Switch to pnpm install --frozen-lockfile",
+      "Add build step (pnpm build) to CI",
+      "Run quality gates locally before commit",
+      "Open PR to upstream linking issue #19"
+    ],
+    "out": [
+      "E2E Playwright tests on PRs (requires Supabase — issue #8/#10)",
+      "Staging deployment environment (issue #10)",
+      "Production deploy hardening / zero-downtime migrations (issue #9)",
+      "Creating labels ci/pr/quality-gates on upstream (no permission)",
+      "Branch protection configuration on upstream (admin-only, post-merge)"
+    ]
+  },
+  "decisions": [
+    {
+      "id": "D1",
+      "title": "Run CI on push and pull_request on main and production",
+      "status": "resolved",
+      "choice": "Option A extended",
+      "rationale": "Keeps existing behavior while adding PR checks on both branches",
+      "affects": [".github/workflows/ci.yml"]
+    },
+    {
+      "id": "D2",
+      "title": "Add build step (pnpm build) to CI",
+      "status": "resolved",
+      "choice": "Option A",
+      "rationale": "Fast feedback; build is static and quick",
+      "affects": [".github/workflows/ci.yml"]
+    },
+    {
+      "id": "D3",
+      "title": "Run E2E on PRs",
+      "status": "resolved",
+      "choice": "Option A",
+      "rationale": "E2E requires Supabase; keep skipped in PR CI",
+      "affects": [".github/workflows/ci.yml"]
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Update .github/workflows/ci.yml for PR triggers",
+      "type": "config",
+      "gate_level": "strict",
+      "depends_on": [],
+      "done": true,
+      "outputs": [".github/workflows/ci.yml"],
+      "test_results": {
+        "yaml": "valid",
+        "prettier": "pass",
+        "typecheck": "pass",
+        "lint": "23 pre-existing app/ errors (unchanged)",
+        "build": "pass"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Run quality gates on the CI change",
+      "type": "test",
+      "gate_level": "strict",
+      "depends_on": [1],
+      "done": true,
+      "outputs": [],
+      "test_results": {
+        "typecheck": "pass",
+        "build": "pass",
+        "test:unit": "70 pass / 3 fail (3 pre-existing dietPlanStore failures, unrelated)",
+        "lint": "23 pre-existing app/ errors (unchanged)"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Commit and open PR to upstream",
+      "type": "process",
+      "gate_level": "light",
+      "depends_on": [2],
+      "done": true,
+      "outputs": ["PR #20 on mahima5srivastava/apex-reps linking issue #19"],
+      "verification": "PR is open with ci.yml change; https://github.com/mahima5srivastava/apex-reps/pull/20"
+    },
+    {
+      "id": 4,
+      "title": "Configure branch protection on upstream (post-merge)",
+      "type": "process",
+      "gate_level": "light",
+      "depends_on": [3],
+      "done": false,
+      "outputs": ["main branch protection requiring CI checks"],
+      "verification": "main requires CI status checks before merge",
+      "note": "BLOCKED by pre-existing Prettier failures (68 files). Do NOT enable branch protection until prettier issues fixed and CI passes on PR #20. Admin access to upstream required.",
+      "qa_blocker": "CI Prettier step fails on 68 pre-existing files; .github/workflows/ci.yml passes prettier locally"
+    }
+  ],
+  "canonical_docs": {
+    "plan": "ai-workspace/changes/19-ci-pr-checks/plan.md",
+    "decisions": "ai-workspace/changes/19-ci-pr-checks/decisions.md",
+    "review": "ai-workspace/changes/19-ci-pr-checks/review.md",
+    "qa": "ai-workspace/changes/19-ci-pr-checks/qa-report.md"
+  },
+  "phase": "done",
+  "created_at": "2026-11-07",
+  "updated_at": "2026-11-07"
+}

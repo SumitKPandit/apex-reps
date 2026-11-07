@@ -46,8 +46,8 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 ### Supporting Schema (Local)
 
-| Schema | Purpose |
-| ------ | ------- |
+| Schema                          | Purpose                          |
+| ------------------------------- | -------------------------------- |
 | `./schemas/handoff.schema.json` | Validates handoff.json structure |
 
 ## Anti-Loop Guardrails
@@ -192,27 +192,28 @@ pnpm test:unit --run | test:integration --run
 ## Workspace Update Patterns
 
 ### tables.md — New Table Entry
+
 ```markdown
 ## `diet_plan_logs`
 
 Mentee consumption tracking per date.
 
-| Column | Type | Constraints | Default | Description |
-|--------|------|-------------|---------|-------------|
-| `id` | `uuid` | PK | `gen_random_uuid()` | Unique log ID |
-| `mentee_id` | `uuid` | NOT NULL, FK → `profiles(id)` CASCADE | — | Mentee user |
-| `diet_plan_id` | `uuid` | NOT NULL, FK → `diet_plans(id)` CASCADE | — | Plan reference |
-| `food_item_id` | `uuid` | NOT NULL, FK → `diet_plan_food_items(id)` CASCADE | — | Food item |
-| `log_date` | `date` | NOT NULL | — | Date of consumption |
-| `consumed` | `boolean` | NOT NULL | `false` | Whether consumed |
-| `consumed_at` | `timestamptz` | — | — | Timestamp when marked |
-| `created_at` | `timestamptz` | NOT NULL | `now()` | |
-| `updated_at` | `timestamptz` | NOT NULL | `now()` | |
+| Column         | Type          | Constraints                                       | Default             | Description           |
+| -------------- | ------------- | ------------------------------------------------- | ------------------- | --------------------- |
+| `id`           | `uuid`        | PK                                                | `gen_random_uuid()` | Unique log ID         |
+| `mentee_id`    | `uuid`        | NOT NULL, FK → `profiles(id)` CASCADE             | —                   | Mentee user           |
+| `diet_plan_id` | `uuid`        | NOT NULL, FK → `diet_plans(id)` CASCADE           | —                   | Plan reference        |
+| `food_item_id` | `uuid`        | NOT NULL, FK → `diet_plan_food_items(id)` CASCADE | —                   | Food item             |
+| `log_date`     | `date`        | NOT NULL                                          | —                   | Date of consumption   |
+| `consumed`     | `boolean`     | NOT NULL                                          | `false`             | Whether consumed      |
+| `consumed_at`  | `timestamptz` | —                                                 | —                   | Timestamp when marked |
+| `created_at`   | `timestamptz` | NOT NULL                                          | `now()`             |                       |
+| `updated_at`   | `timestamptz` | NOT NULL                                          | `now()`             |                       |
 
 **Indexes:** PK on `id`, FKs, unique on `(mentee_id, food_item_id, log_date)`
 
 **RLS Policies:** See [rls-policies.md](./rls-policies.md#diet_plan_logs)
-````
+```
 
 ### rls-policies.md — New Policy Entry
 
@@ -227,7 +228,7 @@ Mentee consumption tracking per date.
 
 ### stores/foodItem.md — New Store Doc
 
-```markdown
+````markdown
 # Food Item Store (`useFoodItemStore`)
 
 ## State
@@ -239,18 +240,18 @@ Mentee consumption tracking per date.
 
 ## Getters
 
-| Getter | Returns | Description |
-|--------|---------|-------------|
-| `isLoading` | `boolean` | `loading` state |
+| Getter      | Returns          | Description        |
+| ----------- | ---------------- | ------------------ |
+| `isLoading` | `boolean`        | `loading` state    |
 | `lastError` | `string \| null` | Last error message |
 
 ## Actions
 
-| Action | Params | Returns | Description |
-|--------|--------|---------|-------------|
-| `searchFoods` | `query: string` | `Promise<FoodItemSearchResult[]>` | Searches food_items with ILIKE, debounced 300ms, cached 24h |
-| `createCustomFood` | `input: CustomFoodInput` | `Promise<FoodItemSearchResult>` | Inserts food as `source='custom'`, clears cache |
-| `clearCache` | — | `void` | Clears in-memory search cache |
+| Action             | Params                   | Returns                           | Description                                                 |
+| ------------------ | ------------------------ | --------------------------------- | ----------------------------------------------------------- |
+| `searchFoods`      | `query: string`          | `Promise<FoodItemSearchResult[]>` | Searches food_items with ILIKE, debounced 300ms, cached 24h |
+| `createCustomFood` | `input: CustomFoodInput` | `Promise<FoodItemSearchResult>`   | Inserts food as `source='custom'`, clears cache             |
+| `clearCache`       | —                        | `void`                            | Clears in-memory search cache                               |
 
 ## Types
 
@@ -263,7 +264,7 @@ interface FoodItemSearchResult {
   carbs_g_per_100g: number;
   fat_g_per_100g: number;
   fiber_g_per_100g: number;
-  source: 'usda' | 'custom';
+  source: "usda" | "custom";
 }
 
 interface CustomFoodInput {
@@ -275,6 +276,7 @@ interface CustomFoodInput {
   fiber_g_per_100g: number;
 }
 ```
+````
 
 ## Patterns
 
@@ -291,11 +293,11 @@ interface CustomFoodInput {
 const store = useFoodItemStore();
 
 // Search
-const results = await store.searchFoods('chicken');
+const results = await store.searchFoods("chicken");
 
 // Create custom food
 const food = await store.createCustomFood({
-  name: 'Whey Isolate',
+  name: "Whey Isolate",
   calories_per_100g: 370,
   protein_g_per_100g: 90,
   carbs_g_per_100g: 3,
@@ -325,6 +327,7 @@ const cached = store.searchResults;
 - **UPDATE/DELETE**: Creator only (policies: `food_items_update_creator`, `food_items_delete_creator`)
 
 Verified in unit tests with mock auth contexts.
+
 ```
 
 ---
@@ -332,13 +335,15 @@ Verified in unit tests with mock auth contexts.
 ## Change Folder Final State
 
 ```
+
 ai-workspace/changes/<issue-id>-<slug>/
-├── plan.md              # Status: Done
-├── decisions.md         # Resolved decisions
-├── review.md            # Single file with round history
-├── qa-report.md         # QA PASS with summary
-├── handoff.json         # Final handoff state
-└── notes.md             # Optional scratchpad
+├── plan.md # Status: Done
+├── decisions.md # Resolved decisions
+├── review.md # Single file with round history
+├── qa-report.md # QA PASS with summary
+├── handoff.json # Final handoff state
+└── notes.md # Optional scratchpad
+
 ```
 
 ---
@@ -368,9 +373,11 @@ ai-workspace/changes/<issue-id>-<slug>/
 ## Usage in Agent Session
 
 ```
+
 User: "Update context after Diet Plan feature (issue #4)"
 
 Agent:
+
 1. READS: qa-report.md (PASS), review.md (APPROVED), handoff.json (what was implemented)
 2. UPDATES AGENTS.md:
    - Adds dietPlan, foodItem stores to Pinia Stores table
@@ -386,4 +393,7 @@ Agent:
 4. VERIFIES: AGENTS.md < 100 lines, cross-links valid
 5. ARCHIVES: ai-workspace/changes/4-food-database-selector/ complete
 6. REPORTS: "Context updated. AGENTS.md + workspace docs current. Change folder archived. Feature complete."
+
+```
+
 ```

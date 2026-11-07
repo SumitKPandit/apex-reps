@@ -54,10 +54,10 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 ### Supporting Schemas (Local)
 
-| Schema | Purpose |
-| ------ | ------- |
-| `./schemas/handoff.schema.json` | Validates handoff.json structure |
-| `./schemas/decision_request.schema.json` | Validates decision requests |
+| Schema                                   | Purpose                          |
+| ---------------------------------------- | -------------------------------- |
+| `./schemas/handoff.schema.json`          | Validates handoff.json structure |
+| `./schemas/decision_request.schema.json` | Validates decision requests      |
 
 **Definition of QA Pass:**
 
@@ -92,6 +92,7 @@ npx agent-browser open http://localhost:3000
 ```
 
 **Why agent-browser instead of Playwright:**
+
 - Real Chrome via Chrome DevTools Protocol (CDP), not a headless test runner
 - Compact accessibility-tree snapshots (~200-400 tokens) instead of full DOM (~3000-5000 tokens)
 - Deterministic element refs (`@e5`, `@e12`) — click/type by ref, no flaky CSS selectors
@@ -101,14 +102,14 @@ npx agent-browser open http://localhost:3000
 
 **agent-browser commands used in QA:**
 
-| Command | Purpose |
-|---------|---------|
-| `npx agent-browser open <url>` | Open Chrome to a URL (starts session) |
-| `npx agent-browser snapshot` | Get accessibility tree with refs — "what the user sees" |
-| `npx agent-browser click @ref` | Click a button/link/input by ref |
-| `npx agent-browser type @ref "text"` | Type into a focused input by ref |
-| `npx agent-browser screenshot <file>.png` | Capture full-page screenshot as evidence |
-| `npx agent-browser close` | End the session |
+| Command                                   | Purpose                                                 |
+| ----------------------------------------- | ------------------------------------------------------- |
+| `npx agent-browser open <url>`            | Open Chrome to a URL (starts session)                   |
+| `npx agent-browser snapshot`              | Get accessibility tree with refs — "what the user sees" |
+| `npx agent-browser click @ref`            | Click a button/link/input by ref                        |
+| `npx agent-browser type @ref "text"`      | Type into a focused input by ref                        |
+| `npx agent-browser screenshot <file>.png` | Capture full-page screenshot as evidence                |
+| `npx agent-browser close`                 | End the session                                         |
 
 ---
 
@@ -456,12 +457,12 @@ SELECT * FROM food_items WHERE source = 'custom' AND created_by = '<coach-id>';
 
 ## Outcome Verification
 
-| Criterion                          | Status   |
-| ---------------------------------- | -------- |
-| All acceptance criteria (scope.in) | PASS/FAIL |
-| Zero console errors in test run    | PASS/FAIL |
-| Zero TypeScript errors             | PASS/FAIL |
-| Build succeeds                     | PASS/FAIL |
+| Criterion                          | Status            |
+| ---------------------------------- | ----------------- |
+| All acceptance criteria (scope.in) | PASS/FAIL         |
+| Zero console errors in test run    | PASS/FAIL         |
+| Zero TypeScript errors             | PASS/FAIL         |
+| Build succeeds                     | PASS/FAIL         |
 | Manual workflow (if testable)      | PASS/FAIL/SKIPPED |
 
 ---
@@ -477,8 +478,8 @@ SELECT * FROM food_items WHERE source = 'custom' AND created_by = '<coach-id>';
 
 ## Skipped Workflows (from scope.out)
 
-| Workflow          | Reason                          |
-| ----------------- | ------------------------------- |
+| Workflow            | Reason                                              |
+| ------------------- | --------------------------------------------------- |
 | Mentee offline sync | Not user-facing (API only), verified via unit tests |
 
 ---
@@ -554,15 +555,15 @@ Agent:
 
 ## Key Difference: QA vs Test Automation
 
-| QA Engineer (This Skill)       | Test Automation                |
-| ------------------------------ | ------------------------------ |
+| QA Engineer (This Skill)               | Test Automation                |
+| -------------------------------------- | ------------------------------ |
 | Drives headed Chrome via agent-browser | Writes `.spec.ts` test files   |
-| Snapshots to visually inspect  | Runs assertions in CI          |
-| Explores edge cases manually   | Encodes known happy paths      |
-| Verifies "does it feel right?" | Verifies "does it match spec?" |
-| Finds unknown UX bugs          | Prevents known regressions     |
-| Output: qa-report.md + screenshots | Output: test-results.xml    |
-| **Complements** automation     | **Complements** QA             |
+| Snapshots to visually inspect          | Runs assertions in CI          |
+| Explores edge cases manually           | Encodes known happy paths      |
+| Verifies "does it feel right?"         | Verifies "does it match spec?" |
+| Finds unknown UX bugs                  | Prevents known regressions     |
+| Output: qa-report.md + screenshots     | Output: test-results.xml       |
+| **Complements** automation             | **Complements** QA             |
 
 ---
 
@@ -577,8 +578,10 @@ Agent:
    - Key workflows for your domain
 3. Add to ai-workspace/changes/README.md:
    - QA report template reference
+
 ```
 
 Let me verify the file was written correctly.
 <tool_call>
 <function=shell>
+```

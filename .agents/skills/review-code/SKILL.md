@@ -91,10 +91,10 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 
 ### Supporting Schemas (Local)
 
-| Schema | Purpose |
-| ------ | ------- |
-| `./schemas/handoff.schema.json` | Validates handoff.json structure |
-| `./schemas/decision_request.schema.json` | Validates decision requests |
+| Schema                                   | Purpose                          |
+| ---------------------------------------- | -------------------------------- |
+| `./schemas/handoff.schema.json`          | Validates handoff.json structure |
+| `./schemas/decision_request.schema.json` | Validates decision requests      |
 
 ## Review Output (Required)
 
@@ -115,6 +115,7 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 ## Round History
 
 ### Round 1
+
 | Item | Status | File:Line                         | Details                                             |
 | ---- | ------ | --------------------------------- | --------------------------------------------------- |
 | B1   | PASS   | —                                 | Names clear, intent obvious                         |
@@ -123,11 +124,12 @@ plan-feature → implement-task → review-code → verify-qa → maintain-conte
 | ...  | ...    | ...                               | ...                                                 |
 
 ### Round 2 (if needed)
-| Item | Status | File:Line                         | Details                                             |
-| ---- | ------ | --------------------------------- | --------------------------------------------------- |
-| B3   | PASS   | `app/stores/foodItem.ts:34`       | Added try/catch + toast                             |
-| B7   | PASS   | `app/components/FoodSelector.vue` | Refactored to store pattern                         |
-| ...  | ...    | ...                               | ...                                                 |
+
+| Item | Status | File:Line                         | Details                     |
+| ---- | ------ | --------------------------------- | --------------------------- |
+| B3   | PASS   | `app/stores/foodItem.ts:34`       | Added try/catch + toast     |
+| B7   | PASS   | `app/components/FoodSelector.vue` | Refactored to store pattern |
+| ...  | ...    | ...                               | ...                         |
 
 ## Non-Blocking Items (N1-N7) — Logged as Issues
 
@@ -184,7 +186,7 @@ If reviewer finds architectural issue requiring new decision:
 1. Emit `decision_request.json` (schema: `./schemas/decision_request.schema.json`)
 2. **Pause** — wait for user response
 3. User answers → written to `decisions.md` + `handoff.json`
-3. Resume review
+4. Resume review
 
 **Decision Request Format:**
 

@@ -23,7 +23,12 @@ describe("useSyncQueue", () => {
 
   it("loads queued items from IndexedDB on init", async () => {
     const stored = [
-      { id: "a", type: "createCustomFood", payload: { name: "X" }, timestamp: 1 },
+      {
+        id: "a",
+        type: "createCustomFood",
+        payload: { name: "X" },
+        timestamp: 1,
+      },
     ];
     idbGet.mockResolvedValue(stored);
 
@@ -67,7 +72,10 @@ describe("useSyncQueue", () => {
     });
 
     await enqueue({ type: "createCustomFood", payload: { name: "OK" } });
-    await enqueue({ type: "createCustomFood", payload: { name: "FAIL", fail: true } });
+    await enqueue({
+      type: "createCustomFood",
+      payload: { name: "FAIL", fail: true },
+    });
 
     await flush(replay);
 
@@ -75,7 +83,9 @@ describe("useSyncQueue", () => {
     expect(queue.value).toHaveLength(1);
     expect(queue.value[0].payload.fail).toBe(true);
     // Persisted the remaining (failed) item.
-    expect(idbSet).toHaveBeenCalledWith("apex-reps-sync-queue", [queue.value[0]]);
+    expect(idbSet).toHaveBeenCalledWith("apex-reps-sync-queue", [
+      queue.value[0],
+    ]);
   });
 
   it("remove deletes an item and persists", async () => {
@@ -83,7 +93,10 @@ describe("useSyncQueue", () => {
     idbSet.mockResolvedValue(undefined);
 
     const { enqueue, remove, queue } = useSyncQueue();
-    const id = await enqueue({ type: "createCustomFood", payload: { name: "X" } });
+    const id = await enqueue({
+      type: "createCustomFood",
+      payload: { name: "X" },
+    });
 
     await remove(id);
 

@@ -299,7 +299,9 @@ onUnmounted(() => {
         >
           <div class="flex justify-between items-center">
             <span class="font-medium">{{ food.name }}</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400 capitalize">{{ food.source }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 capitalize">{{
+              food.source
+            }}</span>
           </div>
           <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {{ food.calories_per_100g }} cal • {{ food.protein_g_per_100g }}g

@@ -133,7 +133,11 @@
       "gate_level": "standard",
       "depends_on": [1],
       "done": true,
-      "outputs": ["app/stores/dietPlan.ts", "app/pages/coach/diet-plans/new.vue", "app/pages/coach/diet-plans/[id]/edit.vue"],
+      "outputs": [
+        "app/stores/dietPlan.ts",
+        "app/pages/coach/diet-plans/new.vue",
+        "app/pages/coach/diet-plans/[id]/edit.vue"
+      ],
       "test_results": {
         "test:unit": "No new unit tests (validation is UI-level, verified via live QA)",
         "lint": "no new errors",
@@ -146,7 +150,10 @@
       "gate_level": "standard",
       "depends_on": [1],
       "done": true,
-      "outputs": ["app/pages/coach/diet-plans/new.vue", "app/pages/coach/diet-plans/[id]/edit.vue"],
+      "outputs": [
+        "app/pages/coach/diet-plans/new.vue",
+        "app/pages/coach/diet-plans/[id]/edit.vue"
+      ],
       "test_results": {
         "test:unit": "No new unit tests (error handling verified via live QA)",
         "lint": "no new errors",

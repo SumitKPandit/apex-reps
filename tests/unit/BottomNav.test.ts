@@ -21,8 +21,13 @@ function mountNav(path: string = "/") {
   return mount(BottomNav, {
     global: {
       stubs: {
-        NuxtLink: { props: ["to"], template: "<a v-bind='$props'><slot /></a>" },
-        UButton: { template: "<button class='u-button-stub'><slot /></button>" },
+        NuxtLink: {
+          props: ["to"],
+          template: "<a v-bind='$props'><slot /></a>",
+        },
+        UButton: {
+          template: "<button class='u-button-stub'><slot /></button>",
+        },
       },
     },
   });

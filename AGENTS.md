@@ -41,15 +41,15 @@
 
 ### Pinia Stores
 
-| Store          | Key Actions                                                            |
-| -------------- | ---------------------------------------------------------------------- |
-| `auth`         | `fetchSession()`, `login()`, `logout()`                                |
-| `profile`      | `fetchProfile()`, `fetchMyMentees()`                                   |
-| `stats`        | `fetchAllStats()`, `fetchLeftPhotos()`, `saveStatsAndPhotos()`         |
-| `subscription` | `fetchActiveSubscription()`                                            |
-| `plan`         | `fetchPlan(planId)`                                                    |
+| Store          | Key Actions                                                                                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `auth`         | `fetchSession()`, `login()`, `logout()`                                                                                                                                                                      |
+| `profile`      | `fetchProfile()`, `fetchMyMentees()`                                                                                                                                                                         |
+| `stats`        | `fetchAllStats()`, `fetchLeftPhotos()`, `saveStatsAndPhotos()`                                                                                                                                               |
+| `subscription` | `fetchActiveSubscription()`                                                                                                                                                                                  |
+| `plan`         | `fetchPlan(planId)`                                                                                                                                                                                          |
 | `dietPlan`     | `fetchPlanForDate()`, `fetchLogs()`, `toggleConsumed()`, `saveNotes()`, `fetchMentees()`, `fetchCoachPlans()`, `createPlan()`, `updatePlan()`, `deletePlan()`, `fetchPlanForEdit()`, `fetchPlansForMentee()` |
-| `foodItem`     | `searchFoods()`, `createCustomFood()`, `flushSyncQueue()`              |
+| `foodItem`     | `searchFoods()`, `createCustomFood()`, `flushSyncQueue()`                                                                                                                                                    |
 
 ### Commands
 
@@ -96,6 +96,13 @@ gh release create | list | view
 | Format            | `pnpm format:check`           |
 | Build             | `pnpm build`                  |
 
+### CI on Pull Requests
+
+`.github/workflows/ci.yml` runs on `push` and `pull_request` to `main` and `production`.
+Steps: Prettier, ESLint, typecheck, build, unit tests (E2E skipped — requires Supabase).
+
+**Blocker:** Pre-existing Prettier formatting issues across 68 files cause the CI Prettier step to fail on PRs. Do not enable branch protection requiring CI checks until these are fixed. See `ai-workspace/changes/19-ci-pr-checks/qa-report.md` for details.
+
 ## Gotchas (Always Relevant)
 
 1. Stats/photos immutable — no UPDATE/DELETE policies
@@ -129,6 +136,7 @@ gh release create | list | view
 - `app/composables/useSyncQueue.ts` — IndexedDB sync queue for offline mutations
 - `app/types/database.ts` — regenerate after migration
 - `.agents/skills/*.md` — update when workflows change
+- `.github/workflows/ci.yml` — CI triggers, steps, and quality gates on PRs
 
 ## Detailed Context (Read When Working On Domain)
 
@@ -146,11 +154,11 @@ gh release create | list | view
 
 ## Test Users (Local Dev)
 
-| Email              | Password           | Role    |
-| ------------------ | ------------------ | ------- |
-| test@example.com   | testpassword123    | mentee  |
-| coach2@example.com | testpassword123    | coach   |
-| mentee2@example.com| testpassword123    | mentee  |
+| Email               | Password        | Role   |
+| ------------------- | --------------- | ------ |
+| test@example.com    | testpassword123 | mentee |
+| coach2@example.com  | testpassword123 | coach  |
+| mentee2@example.com | testpassword123 | mentee |
 
 Run SQL in `ai-workspace/database/migrations.md` after `supabase db reset`.
 

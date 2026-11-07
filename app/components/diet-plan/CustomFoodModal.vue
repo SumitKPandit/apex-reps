@@ -102,7 +102,8 @@ async function handleSubmit() {
     emit("created", food);
     resetForm();
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to create food";
+    const message =
+      err instanceof Error ? err.message : "Failed to create food";
     toast?.add({ title: message, color: "error" });
     console.error("Failed to create custom food:", err);
   } finally {
@@ -169,7 +170,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.body.style.overflow = "";
-  const modal = document.querySelector(".custom-food-modal") as HTMLElement | null;
+  const modal = document.querySelector(
+    ".custom-food-modal",
+  ) as HTMLElement | null;
   if (!modal) return;
   const modalWithCleanup = modal as HTMLElement & {
     _focusTrapCleanup?: () => void;

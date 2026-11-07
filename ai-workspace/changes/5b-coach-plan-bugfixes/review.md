@@ -11,18 +11,18 @@
 
 ### Round 1
 
-| Item | Status | File:Line | Details |
-| ---- | ------ | --------- | ------- |
-| B1 | PASS | — | Names clear: `toggleConsumed`, `fetchLogs`, `DietPlanLog` |
-| B2 | PASS | `app/stores/dietPlan.ts:39-44` | `DietPlanLog` has explicit typed fields, no `macros`; no `any` introduced |
-| B3 | PASS | `app/stores/dietPlan.ts:331-356` | `toggleConsumed` try/catch + throws error; `fetchLogs` try/catch + console.error |
-| B4 | PASS | `app/stores/dietPlan.ts:273-276` | `fetchLogs` early-returns setting `this.logs = {}` when no food items |
-| B5 | PASS | `app/stores/dietPlan.ts:349-355` | Store manages own `this.logs` state; no argument mutation |
-| B6 | PASS | — | No subscriptions/timers/listeners in these functions |
-| B7 | PASS | `app/stores/dietPlan.ts` | Follows existing store pattern (try/catch + console.error + store state) |
-| B8 | PASS | `app/stores/dietPlan.ts:336` | Removed unused `item` variable (was causing lint `no-unused-vars`) |
-| B9 | PASS | `app/stores/dietPlan.ts:335-344` | Parameterized Supabase queries; no string interpolation/injection |
-| B10 | PASS | — | Store-only fix; no UI changes needed |
+| Item | Status | File:Line                        | Details                                                                          |
+| ---- | ------ | -------------------------------- | -------------------------------------------------------------------------------- |
+| B1   | PASS   | —                                | Names clear: `toggleConsumed`, `fetchLogs`, `DietPlanLog`                        |
+| B2   | PASS   | `app/stores/dietPlan.ts:39-44`   | `DietPlanLog` has explicit typed fields, no `macros`; no `any` introduced        |
+| B3   | PASS   | `app/stores/dietPlan.ts:331-356` | `toggleConsumed` try/catch + throws error; `fetchLogs` try/catch + console.error |
+| B4   | PASS   | `app/stores/dietPlan.ts:273-276` | `fetchLogs` early-returns setting `this.logs = {}` when no food items            |
+| B5   | PASS   | `app/stores/dietPlan.ts:349-355` | Store manages own `this.logs` state; no argument mutation                        |
+| B6   | PASS   | —                                | No subscriptions/timers/listeners in these functions                             |
+| B7   | PASS   | `app/stores/dietPlan.ts`         | Follows existing store pattern (try/catch + console.error + store state)         |
+| B8   | PASS   | `app/stores/dietPlan.ts:336`     | Removed unused `item` variable (was causing lint `no-unused-vars`)               |
+| B9   | PASS   | `app/stores/dietPlan.ts:335-344` | Parameterized Supabase queries; no string interpolation/injection                |
+| B10  | PASS   | —                                | Store-only fix; no UI changes needed                                             |
 
 **Round 1: APPROVED** — All 10 blocking items PASS.
 
@@ -30,12 +30,12 @@
 
 During verify-qa, additional bugs were found and fixed:
 
-| Item | Status | File:Line | Details |
-| ---- | ------ | --------- | ------- |
-| BUG-005 | FIXED | `app/stores/dietPlan.ts:344` | Added `{ onConflict: "mentee_id, food_item_id, log_date" }` to upsert — toggle-off now updates existing row instead of duplicate insert error |
-| BUG-006 | FIXED | `app/stores/auth.ts:23,40,61` + `app/utils/supabase.ts:15` | Added `accessToken` to authStore, populated from `supabase.auth.getSession()`, `getSupabase(true)` now uses it — RLS queries succeed in browser |
-| BUG-007 | FIXED | `app/pages/coach/diet-plans/[id]/edit.vue` | Removed auto-save `watch` that fired after initial plan data population, causing immediate redirect |
-| BUG-008 | FIXED | `app/pages/coach/diet-plans/[id]/edit.vue` | Added `finally` block with `loading.value = false`; redirect to `/coach/diet-plans` on profile failure |
+| Item    | Status | File:Line                                                  | Details                                                                                                                                         |
+| ------- | ------ | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| BUG-005 | FIXED  | `app/stores/dietPlan.ts:344`                               | Added `{ onConflict: "mentee_id, food_item_id, log_date" }` to upsert — toggle-off now updates existing row instead of duplicate insert error   |
+| BUG-006 | FIXED  | `app/stores/auth.ts:23,40,61` + `app/utils/supabase.ts:15` | Added `accessToken` to authStore, populated from `supabase.auth.getSession()`, `getSupabase(true)` now uses it — RLS queries succeed in browser |
+| BUG-007 | FIXED  | `app/pages/coach/diet-plans/[id]/edit.vue`                 | Removed auto-save `watch` that fired after initial plan data population, causing immediate redirect                                             |
+| BUG-008 | FIXED  | `app/pages/coach/diet-plans/[id]/edit.vue`                 | Added `finally` block with `loading.value = false`; redirect to `/coach/diet-plans` on profile failure                                          |
 
 **Round 2: APPROVED** — All additional fixes verified via QA.
 
@@ -43,10 +43,10 @@ During verify-qa, additional bugs were found and fixed:
 
 ## Non-Blocking Items (N1-N7) — Logged as Issues
 
-| Item | Issue # | File:Line | Details |
-| ---- | ------- | --------- | ------- |
-| N4 | — | `app/stores/dietPlan.ts` | Store actions lack JSDoc comments — consistent with rest of store (none have JSDoc). Logged as future docs cleanup. |
-| N5 | — | `app/stores/dietPlan.ts` | `fetchLogs` and `toggleConsumed` both touch `diet_plan_logs` but with different operations — not worth extracting a helper yet. |
+| Item | Issue # | File:Line                | Details                                                                                                                         |
+| ---- | ------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| N4   | —       | `app/stores/dietPlan.ts` | Store actions lack JSDoc comments — consistent with rest of store (none have JSDoc). Logged as future docs cleanup.             |
+| N5   | —       | `app/stores/dietPlan.ts` | `fetchLogs` and `toggleConsumed` both touch `diet_plan_logs` but with different operations — not worth extracting a helper yet. |
 
 ---
 
@@ -91,13 +91,13 @@ During verify-qa, additional bugs were found and fixed:
 
 ## Quality Gates Verification
 
-| Gate | Status |
-| ---- | ------ |
-| Unit tests | ✅ 5 new tests pass; 3 pre-existing failures unrelated |
-| Lint | ✅ No new errors |
-| Typecheck | ✅ No new errors |
-| Build | ✅ Typecheck passes (store-only change) |
-| Verify QA | ✅ Edit page loads with plan data; toggle ON + OFF both work |
+| Gate       | Status                                                       |
+| ---------- | ------------------------------------------------------------ |
+| Unit tests | ✅ 5 new tests pass; 3 pre-existing failures unrelated       |
+| Lint       | ✅ No new errors                                             |
+| Typecheck  | ✅ No new errors                                             |
+| Build      | ✅ Typecheck passes (store-only change)                      |
+| Verify QA  | ✅ Edit page loads with plan data; toggle ON + OFF both work |
 
 ---
 

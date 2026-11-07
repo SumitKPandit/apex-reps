@@ -2,10 +2,21 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Handoff Schema",
   "type": "object",
-  "required": ["issue_id", "scope", "decisions", "tasks", "canonical_docs", "phase"],
+  "required": [
+    "issue_id",
+    "scope",
+    "decisions",
+    "tasks",
+    "canonical_docs",
+    "phase"
+  ],
   "properties": {
     "issue_id": { "type": "string" },
-    "mode": { "type": "string", "enum": ["feature", "bugfix", "refactor", "config", "docs"], "default": "feature" },
+    "mode": {
+      "type": "string",
+      "enum": ["feature", "bugfix", "refactor", "config", "docs"],
+      "default": "feature"
+    },
     "scope": {
       "type": "object",
       "required": ["in", "out"],
@@ -36,7 +47,10 @@
         "properties": {
           "id": { "type": "integer" },
           "title": { "type": "string" },
-          "gate_level": { "type": "string", "enum": ["strict", "standard", "light"] },
+          "gate_level": {
+            "type": "string",
+            "enum": ["strict", "standard", "light"]
+          },
           "depends_on": { "type": "array", "items": { "type": "integer" } },
           "done": { "type": "boolean" },
           "outputs": { "type": "array", "items": { "type": "string" } },
@@ -52,7 +66,10 @@
         "decisions": { "type": "string" }
       }
     },
-    "phase": { "type": "string", "enum": ["plan", "implement", "review", "verify", "maintain", "done"] },
+    "phase": {
+      "type": "string",
+      "enum": ["plan", "implement", "review", "verify", "maintain", "done"]
+    },
     "created_at": { "type": "string", "format": "date-time" },
     "updated_at": { "type": "string", "format": "date-time" }
   },

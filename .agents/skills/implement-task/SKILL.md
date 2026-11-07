@@ -86,12 +86,12 @@ FOR EACH TASK IN HANDOFF (in dependency order):
 
 ### Supporting Utilities (Local)
 
-| Utility | Purpose |
-| ------- | ------- |
-| `./utils/dag.ts` | DAG analyzer for gate_level auto-assignment |
-| `./utils/summarize.ts` | Smart context summarizer (preserves types/decisions/errors) |
-| `./schemas/handoff.schema.json` | Validates handoff.json structure |
-| `./schemas/decision_request.schema.json` | Validates decision requests |
+| Utility                                  | Purpose                                                     |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| `./utils/dag.ts`                         | DAG analyzer for gate_level auto-assignment                 |
+| `./utils/summarize.ts`                   | Smart context summarizer (preserves types/decisions/errors) |
+| `./schemas/handoff.schema.json`          | Validates handoff.json structure                            |
+| `./schemas/decision_request.schema.json` | Validates decision requests                                 |
 
 ## Phase 1: Read Handoff (5 min)
 
@@ -234,11 +234,11 @@ export const useDietPlanStore = defineStore('dietPlan', () => {
 
 **Gate Levels (from task.gate_level):**
 
-| Level     | Gates                                                            |
-| --------- | ---------------------------------------------------------------- |
-| `strict`  | `pnpm test:unit --run` + `pnpm test:integration --run` + `pnpm lint` + `pnpm typecheck` + `pnpm format:check` + `pnpm build` |
-| `standard`| `pnpm test:unit --run` + `pnpm lint` + `pnpm typecheck`          |
-| `light`   | `pnpm lint` + `pnpm typecheck`                                   |
+| Level      | Gates                                                                                                                        |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `strict`   | `pnpm test:unit --run` + `pnpm test:integration --run` + `pnpm lint` + `pnpm typecheck` + `pnpm format:check` + `pnpm build` |
+| `standard` | `pnpm test:unit --run` + `pnpm lint` + `pnpm typecheck`                                                                      |
+| `light`    | `pnpm lint` + `pnpm typecheck`                                                                                               |
 
 **Run ALL for task's level, fix ANY failure:**
 
@@ -260,18 +260,18 @@ pnpm build
 
 **Binary checklist — 10 items, all must PASS:**
 
-| #   | Check                            | Pass Criteria                                                   |
-| --- | -------------------------------- | --------------------------------------------------------------- |
-| 1   | **Task acceptance criteria met** | All criteria from handoff.json task satisfied                   |
-| 2   | **Quality gates pass**           | All gates for task's gate_level green                           |
-| 3   | **No regressions**               | Existing tests still pass                                       |
-| 4   | **Error handling**               | All async: try/catch + user toast + logging                     |
-| 5   | **Loading states**               | All async UI shows loading/skeleton                             |
-| 6   | **Empty states**                 | UI handles empty data (no plan, no foods, no logs)              |
-| 7   | **No dead code**                 | No commented code, unused imports, dead branches                |
-| 8   | **No debug artifacts**           | No `console.log`, `debugger`, `console.dir`                     |
-| 9   | **Types explicit**               | No `any`, no implicit `any`, interfaces for objects             |
-| 10  | **Naming consistent**            | Matches codebase conventions                                    |
+| #   | Check                            | Pass Criteria                                       |
+| --- | -------------------------------- | --------------------------------------------------- |
+| 1   | **Task acceptance criteria met** | All criteria from handoff.json task satisfied       |
+| 2   | **Quality gates pass**           | All gates for task's gate_level green               |
+| 3   | **No regressions**               | Existing tests still pass                           |
+| 4   | **Error handling**               | All async: try/catch + user toast + logging         |
+| 5   | **Loading states**               | All async UI shows loading/skeleton                 |
+| 6   | **Empty states**                 | UI handles empty data (no plan, no foods, no logs)  |
+| 7   | **No dead code**                 | No commented code, unused imports, dead branches    |
+| 8   | **No debug artifacts**           | No `console.log`, `debugger`, `console.dir`         |
+| 9   | **Types explicit**               | No `any`, no implicit `any`, interfaces for objects |
+| 10  | **Naming consistent**            | Matches codebase conventions                        |
 
 **Cycle 1:** Run checklist. FAIL → fix → re-run Phase 4 → Cycle 2.
 
@@ -296,7 +296,7 @@ pnpm build
 1. Emit `decision_request.json` (schema: `./schemas/decision_request.schema.json`)
 2. **Pause execution** — wait for user response
 3. User answers → written to `decisions.md` + `handoff.json`
-3. Resume implementation
+4. Resume implementation
 
 **Decision Request Format:**
 
@@ -317,10 +317,10 @@ pnpm build
 
 **Threshold Guide:**
 
-| Threshold    | When to Use                                      | Action    |
-| ------------ | ------------------------------------------------ | --------- |
-| `architectural` | Affects >2 files OR changes interface OR no pattern exists | **Sync pause** |
-| `tactical`   | Naming, formatting, minor logic                  | Async (use recommendation, flag for review) |
+| Threshold       | When to Use                                                | Action                                      |
+| --------------- | ---------------------------------------------------------- | ------------------------------------------- |
+| `architectural` | Affects >2 files OR changes interface OR no pattern exists | **Sync pause**                              |
+| `tactical`      | Naming, formatting, minor logic                            | Async (use recommendation, flag for review) |
 
 ---
 
