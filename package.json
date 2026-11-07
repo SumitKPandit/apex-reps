@@ -19,6 +19,7 @@
     "@pinia/nuxt": "^1.0.2",
     "@supabase/supabase-js": "^2.112.3",
     "@vueuse/core": "^15.0.0",
+    "idb-keyval": "^6.3.0",
     "nuxt": "^4.5.2",
     "nuxt-charts": "^2.2.1",
     "pinia": "^4.0.3",

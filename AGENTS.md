@@ -29,6 +29,7 @@
 | Storage                        | `ai-workspace/database/storage.md`       |
 | Migrations                     | `ai-workspace/database/migrations.md`    |
 | Relationships                  | `ai-workspace/database/relationships.md` |
+| C4 architecture diagrams       | `docs/c4/` (Levels 1–4)                  |
 | **Workflow Skills** (in order) | `.agents/skills/`                        |
 | 1. Plan feature                | `plan-feature`                           |
 | 2. Implement task              | `implement-task`                         |
@@ -48,7 +49,7 @@
 | `subscription` | `fetchActiveSubscription()`                                            |
 | `plan`         | `fetchPlan(planId)`                                                    |
 | `dietPlan`     | `fetchPlanForDate()`, `fetchLogs()`, `toggleConsumed()`, `saveNotes()`, `fetchMentees()`, `fetchCoachPlans()`, `createPlan()`, `updatePlan()`, `deletePlan()`, `fetchPlanForEdit()`, `fetchPlansForMentee()` |
-| `foodItem`     | `searchFoods()`, `createCustomFood()`                                  |
+| `foodItem`     | `searchFoods()`, `createCustomFood()`, `flushSyncQueue()`              |
 
 ### Commands
 
@@ -123,6 +124,9 @@ gh release create | list | view
 - `app/components/diet-plan/CustomFoodModal.vue` — custom food modal
 - `app/components/BottomNav.vue` — mobile-only bottom navigation (Dashboard, Check-in, Diet Plan tabs)
 - `app/composables/useFoodCache.ts` — IndexedDB caching
+- `app/composables/useOnlineStatus.ts` — online/offline detection
+- `app/composables/usePWA.ts` — service worker registration + install prompt
+- `app/composables/useSyncQueue.ts` — IndexedDB sync queue for offline mutations
 - `app/types/database.ts` — regenerate after migration
 - `.agents/skills/*.md` — update when workflows change
 
@@ -152,4 +156,4 @@ Run SQL in `ai-workspace/database/migrations.md` after `supabase db reset`.
 
 ## Last Updated
 
-2026-11-01
+2026-11-07
